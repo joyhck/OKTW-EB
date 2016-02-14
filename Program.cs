@@ -421,7 +421,7 @@ namespace OKTWJayce
         private static void LogicE2()
         {
             var t = TargetSelector.GetTarget(E2.Range, DamageType.Physical);
-            if (t.IsValidTarget() && E2.IsInRange(t))
+            if (t.IsValidTarget() && E2.IsInRange(t) && E2.IsReady() && E2.IsLearned)
             {
                 if (GetRealDamage(SpellSlot.E, t) > t.Health && !Range)
                 {
