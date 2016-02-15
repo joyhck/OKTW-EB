@@ -56,7 +56,6 @@ namespace OKTWJayce
         public static bool autoEks { get { return Menu["autoEks"].Cast<CheckBox>().CurrentValue; } }
         public static int harassMana { get { return Menu["harassMana"].Cast<Slider>().CurrentValue; } }
         public static bool autoW { get { return Menu["autoW"].Cast<CheckBox>().CurrentValue; } }
-        public static bool QEforce { get { return Menu["QEforce"].Cast<CheckBox>().CurrentValue; } }
         public static bool intE { get { return Menu["intE"].Cast<CheckBox>().CurrentValue; } }
         public static bool autoQ { get { return Menu["autoQ"].Cast<CheckBox>().CurrentValue; } }
         public static bool autoQm { get { return Menu["autoQm"].Cast<CheckBox>().CurrentValue; } }
@@ -64,6 +63,7 @@ namespace OKTWJayce
         public static bool autoEm { get { return Menu["autoEm"].Cast<CheckBox>().CurrentValue; } }
         public static int Mana { get { return Menu["Mana"].Cast<Slider>().CurrentValue; } }
         public static int LCminions { get { return Menu["LCminions"].Cast<Slider>().CurrentValue; } }
+        public static int qeset { get { return Menu["qeset"].Cast<Slider>().CurrentValue; } }
         public static bool farmQ { get { return Menu["farmQ"].Cast<CheckBox>().CurrentValue; } }
         public static bool farmW { get { return Menu["farmW"].Cast<CheckBox>().CurrentValue; } }
         public static bool jungleQ { get { return Menu["jungleQ"].Cast<CheckBox>().CurrentValue; } }
@@ -90,59 +90,67 @@ namespace OKTWJayce
             Menu.AddGroupLabel("Ex : Q2 = Melee");
             Menu.AddSeparator();
             Menu.AddGroupLabel("Combo");
-            Menu.Add("autoQ", new CheckBox("Use Q1", true));
-            Menu.Add("autoW", new CheckBox("Use W1", true));
-            Menu.Add("autoE", new CheckBox("Use E1 (Q + E)", true));
+            Menu.Add("autoQ", new CheckBox("Use Q1"));
+            Menu.Add("autoW", new CheckBox("Use W1"));
+            Menu.Add("autoE", new CheckBox("Use E1 (Q + E)"));
             Menu.AddSeparator();
-            Menu.Add("autoQm", new CheckBox("Use Q2", true));
-            Menu.Add("autoWm", new CheckBox("Use W2", true));
-            Menu.Add("autoEm", new CheckBox("Use E2", true));
+            Menu.Add("autoQm", new CheckBox("Use Q2"));
+            Menu.Add("autoWm", new CheckBox("Use W2"));
+            Menu.Add("autoEm", new CheckBox("Use E2"));
             Menu.AddSeparator();
-            Menu.Add("autoRm", new CheckBox("Automatic R logic to melee", true));
-            Menu.Add("autoR", new CheckBox("Automatic R logic to ranged", true));
+            Menu.Add("autoRm", new CheckBox("Automatic R logic to melee"));
+            Menu.Add("autoR", new CheckBox("Automatic R logic to ranged"));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Harass");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.Team != myHero.Team))
-                Menu.Add("haras" + enemy.ChampionName, new CheckBox("Harass " + enemy.ChampionName, true));
+                Menu.Add("haras" + enemy.ChampionName, new CheckBox("Harass " + enemy.ChampionName));
 
             Menu.Add("harassMana", new Slider("Harass Mana", 80, 0, 100));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Laneclear");
-            Menu.Add("farmQ", new CheckBox("Use Q2 + E2", true));
-            Menu.Add("farmW", new CheckBox("Use W1 & W2", true));
+            Menu.Add("farmQ", new CheckBox("Use Q2 + E2"));
+            Menu.Add("farmW", new CheckBox("Use W1 & W2"));
             Menu.AddSeparator();
             Menu.Add("Mana", new Slider("Mana Manager", 80, 0, 100));
             Menu.Add("LCminions", new Slider("Minimum Minions", 2, 0, 10));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Jungle clear");
-            Menu.Add("jungleQ", new CheckBox("Use Q1", true));
-            Menu.Add("jungleE", new CheckBox("Use E1", true));
+            Menu.Add("jungleQ", new CheckBox("Use Q1"));
+            Menu.Add("jungleE", new CheckBox("Use E1"));
             Menu.AddSeparator();
-            Menu.Add("jungleQm", new CheckBox("Use Q2", true));
-            Menu.Add("jungleWm", new CheckBox("Use W2", true));
-            Menu.Add("jungleEm", new CheckBox("Use E2", true));
+            Menu.Add("jungleQm", new CheckBox("Use Q2"));
+            Menu.Add("jungleWm", new CheckBox("Use W2"));
+            Menu.Add("jungleEm", new CheckBox("Use E2"));
             Menu.AddSeparator();
-            Menu.Add("jungleR", new CheckBox("Use R to switch", true));
+            Menu.Add("jungleR", new CheckBox("Use R to switch"));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Drawings");
-            Menu.Add("showcd", new CheckBox("Show cooldown", true));
-            Menu.Add("onlyRdy", new CheckBox("Draw only ready spells", true));
-            Menu.Add("qRange", new CheckBox("Show [Q1+E1]/[Q2] range", true));
+            Menu.Add("showcd", new CheckBox("Show cooldown"));
+            Menu.Add("onlyRdy", new CheckBox("Draw only ready spells"));
+            Menu.Add("qRange", new CheckBox("Show [Q1+E1]/[Q2] range"));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Misc");
-            Menu.Add("QEsplash", new CheckBox("Q + E splash minion damage", true));
+            Menu.Add("QEsplash", new CheckBox("Q + E splash minion damage"));
             Menu.Add("QEsplashAdjust", new Slider("Q + E splash minion radius", 150, 50, 250));
             Menu.AddSeparator();
-            Menu.Add("gapE", new CheckBox("Gapclose R + E2", true));
-            Menu.Add("intE", new CheckBox("Interrupt spells", true));
+            Menu.Add("gapE", new CheckBox("Gapclose R + E2"));
+            Menu.Add("intE", new CheckBox("Interrupt spells"));
             Menu.AddSeparator();
-            Menu.Add("autoEks", new CheckBox("E melee ks only", true));
-            Menu.Add("QEforce", new CheckBox("Force E when Q", true));
+            Menu.Add("autoEks", new CheckBox("Use E2 to KS only?"));
+            Menu.AddSeparator();
+            Menu.AddLabel("1 : Only Force E1 > Q1 in Combo");
+            Menu.AddLabel("2 : NEVER use E1 after Q1");
+            Menu.AddLabel("3 : Always");
+            Menu.AddLabel("4 : Only E1 > Q1 in harass");
+            Menu.AddLabel("5 : Only E1 > Q1 in combo & harass");
+            Menu.Add("qeset", new Slider("E1 > Q1 Combo settings : (^^) ", 3, 1, 5));
+            Menu.AddSeparator();
+
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1030, SkillShotType.Linear, 25, 1450, 70);
             Qext = new Spell.Skillshot(SpellSlot.Q, 1650, SkillShotType.Linear, 30, 2000, 80);
@@ -700,8 +708,22 @@ namespace OKTWJayce
             {
                 if (W.IsReady() && !Range && myHero.Mana > 80)
                     W.Cast();
-                if (E.IsReady() && Range && QEforce)
+                if (E.IsReady() && Range && qeset == 1 && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
                     E.Cast((Vector3)myHero.ServerPosition.Extend(args.EndPosition, 120));
+                }
+                else if (E.IsReady() && Range && qeset == 3)
+                {
+                    E.Cast((Vector3)myHero.ServerPosition.Extend(args.EndPosition, 120));
+                }
+                else if (E.IsReady() && Range && qeset == 4 && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    E.Cast((Vector3)myHero.ServerPosition.Extend(args.EndPosition, 120));
+                }
+                else if (E.IsReady() && Range && qeset == 5 && (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)))
+                {
+                    E.Cast((Vector3)myHero.ServerPosition.Extend(args.EndPosition, 120));
+                }
             }
         }
 
@@ -709,7 +731,25 @@ namespace OKTWJayce
         {
             if (sender.IsMe && args.SData.Name == "jayceshockblast")
             {
-                if (Range && E.IsReady() && autoE)
+                if (Range && E.IsReady() && autoE && qeset == 1 && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    EcastPos = (Vector3)myHero.ServerPosition.Extend(args.End, 130 + (Game.Ping / 2));
+                    Etick = Environment.TickCount;
+                    E.Cast(EcastPos);
+                }
+                else if (Range && E.IsReady() && autoE && qeset == 3)
+                {
+                    EcastPos = (Vector3)myHero.ServerPosition.Extend(args.End, 130 + (Game.Ping / 2));
+                    Etick = Environment.TickCount;
+                    E.Cast(EcastPos);
+                }
+                else if (Range && E.IsReady() && autoE && qeset == 4 && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    EcastPos = (Vector3)myHero.ServerPosition.Extend(args.End, 130 + (Game.Ping / 2));
+                    Etick = Environment.TickCount;
+                    E.Cast(EcastPos);
+                }
+                else if (Range && E.IsReady() && autoE && qeset == 5 && (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)))
                 {
                     EcastPos = (Vector3)myHero.ServerPosition.Extend(args.End, 130 + (Game.Ping / 2));
                     Etick = Environment.TickCount;
@@ -726,7 +766,6 @@ namespace OKTWJayce
                     W.Cast();
                 else if (args.Target.Position.Distance(myHero.Position) < 500)
                     W.Cast();
-                Console.WriteLine("Using W in OnPreAttack");
             }
         }
     }
