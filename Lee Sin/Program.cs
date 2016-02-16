@@ -250,7 +250,7 @@ namespace LeeSin
             Menu.Add("bonusRangeT", new Slider("Tower Bonus Range", 0, 0, 1000));
             Menu.AddSeparator();
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1100, SkillShotType.Linear, 250, 1800, 60);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1075, SkillShotType.Linear, 250, 1800, 60);
             Q2 = new Spell.Active(SpellSlot.Q, 1300);
             W = new Spell.Targeted(SpellSlot.W, 700);
             W2 = new Spell.Active(SpellSlot.W);
@@ -357,6 +357,8 @@ namespace LeeSin
             }
         }
 
+        public static bool castR = false;
+
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
             if (target.IsMe && PassiveStacks > 0)
@@ -412,7 +414,7 @@ namespace LeeSin
 
                 var newTarget = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
 
-                if (newTarget != null)
+                if (newTarget != null && R.IsReady())
                 {
                     InsecCombo(newTarget);
                 }
@@ -451,22 +453,29 @@ namespace LeeSin
             {
                 Orbwalk(Game.CursorPos);
 
-                var target = TargetSelector.GetTarget(R.Range + 100, DamageType.Physical);
+                var target = TargetSelector.GetTarget(flashSlot.Range - 25, DamageType.Physical);
 
-                if (target == null || !flashSlot.IsReady())
+                if (target == null)
                 {
                     return;
                 }
 
-                if (GetInsecPos(target).Distance(myHero.Position) < 425 && ElLeeSinInsecUseInstaFlash && flashSlot.IsReady())
+                if (!R.IsReady() && !flashSlot.IsReady()) {
+                    castR = false;
+                    return;
+                }
+
+                if (GetInsecPos(target).Distance(myHero.Position) < 425 && ElLeeSinInsecUseInstaFlash && flashSlot.IsReady() && R.IsReady())
                 {
                     flashSlot.Cast(GetInsecPos(target));
+                    castR = true;
                     return;
                 }
 
-                if (R.IsReady() && !target.IsZombie && target.Distance(myHero) < 375 && !flashSlot.IsReady())
+                if (R.IsReady() && !target.IsZombie && R.IsInRange(target) && castR)
                 {
                     R.Cast(target);
+                    castR = false;
                 }
             }
 
@@ -542,7 +551,7 @@ namespace LeeSin
 
             if (W.IsReady() && ElLeeSinJungleW)
             {
-                if (WState && minion.Distance(myHero) < myHero.GetAutoAttackRange())
+                if (WState)// && minion.Distance(myHero) < myHero.GetAutoAttackRange())
                 {
                     W.Cast(myHero);
                     LastSpell = Environment.TickCount;
@@ -627,11 +636,13 @@ namespace LeeSin
                     Q2.Cast();
                 }
             }
+
             if (target.Distance(myHero) > R.Range && target.Distance(myHero) < R.Range + 580 && target.HasQBuff())
             {
                 WardJump(target.Position, false);
             }
-            if (E.IsReady() && EState && target.IsValidTarget(E.Range))
+
+            if (E.IsReady() && EState && target.IsValidTarget(E.Range - 25))
             {
                 E.Cast();
             }
@@ -894,25 +905,50 @@ namespace LeeSin
                 insecPos = myHero.Position;
             }
 
-            if (GetAllyHeroes(target, 2000 + bonusRangeA).Count > 0 && ElLeeSinInsecAlly)
-            {
-                var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + bonusRangeA)));
+            if (ElLeeSinInsecUseInstaFlash) {
+                if (GetAllyHeroes(target, 2000 + bonusRangeA).Count > 0 && ElLeeSinInsecAlly)
+                {
+                    var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + bonusRangeA)));
 
-                InsecLinePos = Drawing.WorldToScreen(insecPosition);
-                return V2E(insecPosition, target.Position, target.Distance(insecPosition) + 210).To3D();
+                    InsecLinePos = Drawing.WorldToScreen(insecPosition);
+                    return V2E(insecPosition, target.Position, target.Distance(insecPosition) + 165).To3D();
+                }
+
+                if (ElLeeSinInsecOriginalPos)
+                {
+                    InsecLinePos = Drawing.WorldToScreen(insecPos);
+                    return V2E(insecPos, target.Position, target.Distance(insecPos) + 165).To3D();
+                }
+
+                if (insecmouse)
+                {
+                    InsecLinePos = Drawing.WorldToScreen(Game.CursorPos);
+
+                    return V2E(Game.CursorPos, target.Position, target.Distance(insecPos) + 165).To3D();
+                }
             }
-
-            if (ElLeeSinInsecOriginalPos)
+            else
             {
-                InsecLinePos = Drawing.WorldToScreen(insecPos);
-                return V2E(insecPos, target.Position, target.Distance(insecPos) + 210).To3D();
-            }
+                if (GetAllyHeroes(target, 2000 + bonusRangeA).Count > 0 && ElLeeSinInsecAlly)
+                {
+                    var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + bonusRangeA)));
 
-            if (insecmouse)
-            {
-                InsecLinePos = Drawing.WorldToScreen(Game.CursorPos);
+                    InsecLinePos = Drawing.WorldToScreen(insecPosition);
+                    return V2E(insecPosition, target.Position, target.Distance(insecPosition) + 210).To3D();
+                }
 
-                return V2E(Game.CursorPos, target.Position, target.Distance(insecPos) + 210).To3D();
+                if (ElLeeSinInsecOriginalPos)
+                {
+                    InsecLinePos = Drawing.WorldToScreen(insecPos);
+                    return V2E(insecPos, target.Position, target.Distance(insecPos) + 210).To3D();
+                }
+
+                if (insecmouse)
+                {
+                    InsecLinePos = Drawing.WorldToScreen(Game.CursorPos);
+
+                    return V2E(Game.CursorPos, target.Position, target.Distance(insecPos) + 210).To3D();
+                }
             }
 
             return new Vector3();
@@ -1147,7 +1183,9 @@ namespace LeeSin
                     }
                 }
 
-                if (castQAgain || target.HasBuffOfType(BuffType.Knockback) && !myHero.IsValidTarget(300) && !R.IsReady() || !target.IsValidTarget(myHero.GetAutoAttackRange()) || myHero.GetSpellDamage(target, SpellSlot.R, DamageLibrary.SpellStages.SecondCast) > target.Health || ReturnQBuff().Distance(target) < myHero.Distance(target) && !target.IsValidTarget(myHero.GetAutoAttackRange()))
+                var prediction = Q.GetPrediction(target);
+
+                if (castQAgain || target.HasBuffOfType(BuffType.Knockback) && !myHero.IsValidTarget(300) && !R.IsReady() && prediction.HitChance >= HitChance.High || !target.IsValidTarget(myHero.GetAutoAttackRange()) || myHero.GetSpellDamage(target, SpellSlot.R, DamageLibrary.SpellStages.SecondCast) > target.Health || ReturnQBuff().Distance(target) < myHero.Distance(target) && !target.IsValidTarget(myHero.GetAutoAttackRange()))
                 {
                     Q.Cast(target);
                 }
@@ -1236,14 +1274,21 @@ namespace LeeSin
                             foreach (var unit in ObjectManager.Get<Obj_AI_Base>().Where(obj => (((obj is Obj_AI_Minion) && myHero.GetSpellDamage(target, SpellSlot.Q) < obj.Health + 10) || (obj is AIHeroClient)) && obj.IsValidTarget(Q.Range) && obj.Distance(GetInsecPos(target)) < 500))
                             {
                                 var pred = Q.GetPrediction(unit);
-                                Q.Cast(pred.CastPosition);
+                                if (pred.HitChance >= HitChance.High)
+                                {
+                                    Q.Cast(pred.CastPosition);
+                                }
                                 break;
                             }
                         }
 
                         if (!(target.HasQBuff()) && QState)
                         {
-                            CastQ(target, ElLeeSinSmiteQ);
+                            var predictiona = Q.GetPrediction(target);
+                            if (predictiona.HitChance >= HitChance.High)
+                            {
+                                CastQ(target, ElLeeSinSmiteQ);
+                            }
                         }
                         else if (target.HasQBuff())
                         {
