@@ -460,7 +460,8 @@ namespace LeeSin
                     return;
                 }
 
-                if (!R.IsReady() && !flashSlot.IsReady()) {
+                if (!R.IsReady() && !flashSlot.IsReady())
+                {
                     castR = false;
                     return;
                 }
@@ -905,7 +906,8 @@ namespace LeeSin
                 insecPos = myHero.Position;
             }
 
-            if (ElLeeSinInsecUseInstaFlash) {
+            if (ElLeeSinInsecUseInstaFlash)
+            {
                 if (GetAllyHeroes(target, 2000 + bonusRangeA).Count > 0 && ElLeeSinInsecAlly)
                 {
                     var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + bonusRangeA)));
@@ -1284,11 +1286,7 @@ namespace LeeSin
 
                         if (!(target.HasQBuff()) && QState)
                         {
-                            var predictiona = Q.GetPrediction(target);
-                            if (predictiona.HitChance >= HitChance.High)
-                            {
-                                CastQ(target, ElLeeSinSmiteQ);
-                            }
+                            CastQ(target, ElLeeSinSmiteQ);
                         }
                         else if (target.HasQBuff())
                         {
