@@ -64,6 +64,7 @@ namespace ExoryDraven
         public static int stopcatch { get { return Menu["stopcatch"].Cast<Slider>().CurrentValue; } }
 
         public static int manaforW { get { return Menu["manaforW"].Cast<Slider>().CurrentValue; } }
+        public static int autoR { get { return Menu["autoR"].Cast<Slider>().CurrentValue; } }
 
         #endregion
 
@@ -87,6 +88,7 @@ namespace ExoryDraven
             Menu.Add("useR", new CheckBox("Use R", true));
             Menu.Add("ph", new CheckBox("Catch Axe/Axe Helper?", true));
             Menu.Add("killable", new CheckBox("If target killable with 3 auto's stop catch?", true));
+            Menu.Add("autoR", new Slider("[Combo] Use R only when more than X enemies : ", 2, 1, 5));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Harass");
@@ -128,7 +130,7 @@ namespace ExoryDraven
 
             Q = new Spell.Active(SpellSlot.Q, (uint)myHero.GetAutoAttackRange());
             W = new Spell.Active(SpellSlot.W);
-            E = new Spell.Skillshot(SpellSlot.E, 1059, SkillShotType.Linear, 250, 1400, 130);
+            E = new Spell.Skillshot(SpellSlot.E, 1045, SkillShotType.Linear, 250, 1400, 130);
             R = new Spell.Skillshot(SpellSlot.R, 1500, SkillShotType.Linear, 400, 2000, 160);
 
             Game.OnTick += OnUpdate;
@@ -398,7 +400,7 @@ namespace ExoryDraven
                 E.Cast(target);
             }
 
-            if (R.IsReady() && R.IsInRange(target) && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && myHero.CountEnemiesInRange(myHero.AttackRange + 100) >= 2 && useR)
+            if (R.IsReady() && R.IsInRange(target) && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && myHero.CountEnemiesInRange(myHero.AttackRange + 500) >= autoR && useR)
             {
                 R.Cast(target);
             }
