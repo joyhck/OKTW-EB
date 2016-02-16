@@ -59,6 +59,7 @@ namespace ExoryDraven
         public static bool gapclose { get { return Menu["gapclose"].Cast<CheckBox>().CurrentValue; } }
         public static bool useWSlow { get { return Menu["useWSlow"].Cast<CheckBox>().CurrentValue; } }
         public static bool useWavail { get { return Menu["useWavail"].Cast<CheckBox>().CurrentValue; } }
+        public static bool killable { get { return Menu["killable"].Cast<CheckBox>().CurrentValue; } }
 
         public static int stopcatch { get { return Menu["stopcatch"].Cast<Slider>().CurrentValue; } }
 
@@ -85,6 +86,7 @@ namespace ExoryDraven
             Menu.Add("useE", new CheckBox("Use E", true));
             Menu.Add("useR", new CheckBox("Use R", true));
             Menu.Add("ph", new CheckBox("Catch Axe/Axe Helper?", true));
+            Menu.Add("killable", new CheckBox("If target killable with 3 auto's stop catch?", true));
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Harass");
@@ -164,6 +166,8 @@ namespace ExoryDraven
 
                 KS(args);
 
+                qssCheck();
+
                 var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
 
                 if (useWSlow && myHero.HasBuffOfType(BuffType.Slow) && myHero.ManaPercent > manaforW && W.IsReady())
@@ -178,6 +182,7 @@ namespace ExoryDraven
 
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
+                    useItems(target);
                     if (target != null)
                     {
                         ExecuteQ(args);
@@ -197,6 +202,30 @@ namespace ExoryDraven
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                 {
                     Clear();
+                }
+            }
+        }
+
+        private static void useItems(AIHeroClient target)
+        {
+            if (Item.HasItem(ItemId.Youmuus_Ghostblade) && Item.CanUseItem(ItemId.Quicksilver_Sash) && target.Distance(myHero) >= myHero.GetAutoAttackRange())
+            {
+                Item.UseItem(ItemId.Youmuus_Ghostblade);
+            }
+        }
+
+        private static void qssCheck()
+        {
+            var target = myHero;
+            if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) || target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || target.IsStunned)
+            {
+                if ((Item.HasItem(ItemId.Quicksilver_Sash) && Item.CanUseItem(ItemId.Quicksilver_Sash)))
+                {
+                    Item.UseItem(ItemId.Quicksilver_Sash);
+                }
+                if ((Item.HasItem(ItemId.Mercurial_Scimitar) && Item.CanUseItem(ItemId.Mercurial_Scimitar)))
+                {
+                    Item.UseItem(ItemId.Mercurial_Scimitar);
                 }
             }
         }
@@ -303,11 +332,21 @@ namespace ExoryDraven
 
         public static void ExecutePathing(EventArgs args)
         {
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+
             if (ph)
             {
                 if (stopcatch >= myHero.HealthPercent || myHero.IsRecalling())
                 {
                     return;
+                }
+
+                if (killable && target != null)
+                {
+                    if (myHero.GetAutoAttackDamage(target) * 2 > target.Health)
+                    {
+                        return;
+                    }
                 }
 
                 if (ObjectManager.Get<GameObject>().Any(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")) && ObjectManager.Get<GameObject>().First(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position.Distance(myHero.ServerPosition) >= 0f)
