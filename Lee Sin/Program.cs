@@ -453,7 +453,7 @@ namespace LeeSin
 
                 var target = TargetSelector.GetTarget(R.Range + 100, DamageType.Physical);
 
-                if (target == null)
+                if (target == null || !flashSlot.IsReady())
                 {
                     return;
                 }
@@ -1123,10 +1123,7 @@ namespace LeeSin
         private static void Combo()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-            if (target == null)
-            {
-                return;
-            }
+            if (target == null) { return; }
 
             UseItems(target);
 
