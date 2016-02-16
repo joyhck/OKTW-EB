@@ -359,8 +359,9 @@ namespace ExoryDraven
 
                     if (ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position.Distance(myHero.ServerPosition) <= 92f)
                     {
-                        Orbwalker.DisableMovement = false;
+                        Orbwalker.DisableMovement = true;
                         Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
+						Orbwalker.DisableMovement = false;
                         return;
                     }
                     else
