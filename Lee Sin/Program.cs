@@ -1130,6 +1130,11 @@ namespace LeeSin
 
             UseItems(target);
 
+            if (Q.IsReady() && Q.Name == "BlindMonkQOne" && ElLeeSinComboQ)
+            {
+                CastQ(target, ElLeeSinSmiteQ);
+            }
+
             if (!target.IsZombie && R.IsReady() && ElLeeSinComboR && ElLeeSinComboQ && target.IsValidTarget(R.Range) && (myHero.GetSpellDamage(target, SpellSlot.R) >= target.Health || target.HasQBuff() && target.Health < myHero.GetSpellDamage(target, SpellSlot.R) + Q2Damage(target, myHero.GetSpellDamage(target, SpellSlot.R))))
             {
                 R.Cast(target);
@@ -1154,11 +1159,6 @@ namespace LeeSin
             if (!target.IsZombie && myHero.GetSpellDamage(target, SpellSlot.R) >= target.Health && ElLeeSinComboKSR && target.IsValidTarget())
             {
                 R.Cast(target);
-            }
-
-            if (Q.IsReady() && Q.Name == "BlindMonkQOne" && ElLeeSinComboQ)
-            {
-                CastQ(target, ElLeeSinSmiteQ);
             }
 
             if (ElLeeSinComboAAStacks && PassiveStacks > ElLeeSinComboPassiveStacks && myHero.GetAutoAttackRange() > myHero.Distance(target))
