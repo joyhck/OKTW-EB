@@ -40,8 +40,21 @@ namespace KogMaw
         public static bool useE { get { return Menu["useE"].Cast<CheckBox>().CurrentValue; } }
         public static bool useR { get { return Menu["useR"].Cast<CheckBox>().CurrentValue; } }
         public static int rLimit { get { return Menu["rLimit"].Cast<Slider>().CurrentValue; } }
+        public static int rLimitH { get { return Menu["rLimitH"].Cast<Slider>().CurrentValue; } }
+        public static int rLimitLC { get { return Menu["rLimitLC"].Cast<Slider>().CurrentValue; } }
+        public static int rLimitJG { get { return Menu["rLimitJG"].Cast<Slider>().CurrentValue; } }
+        public static int manaH { get { return Menu["manaH"].Cast<Slider>().CurrentValue; } }
+        public static int manaLC { get { return Menu["manaLC"].Cast<Slider>().CurrentValue; } }
+        public static int manaJG { get { return Menu["manaJG"].Cast<Slider>().CurrentValue; } }
         public static bool manaW { get { return Menu["manaW"].Cast<CheckBox>().CurrentValue; } }
         public static bool useWJG { get { return Menu["useWJG"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useEJG { get { return Menu["useEJG"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useRJG { get { return Menu["useRJG"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useQH { get { return Menu["useQH"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useEH { get { return Menu["useEH"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useRH { get { return Menu["useRH"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useELC { get { return Menu["useELC"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useRLC { get { return Menu["useRLC"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         private static void OnLoad(EventArgs args)
@@ -62,8 +75,26 @@ namespace KogMaw
             Menu.Add("manaW", new CheckBox("Keep Mana For W"));
             Menu.Add("rLimit", new Slider("R stack limit", 3, 1, 6));
             Menu.AddSeparator();
+            Menu.AddGroupLabel("Harass");
+            Menu.Add("useQH", new CheckBox("Use Q"));
+            Menu.Add("useEH", new CheckBox("Use E"));
+            Menu.Add("useRH", new CheckBox("Use R"));
+            Menu.Add("rLimitH", new Slider("R stack limit", 1, 1, 6));
+            Menu.Add("manaH", new Slider("Do Harass if mana is greater than :", 60, 1, 100));
+            Menu.AddSeparator();
+            Menu.AddGroupLabel("Lane Clear");
+            Menu.Add("useELC", new CheckBox("Use E"));
+            Menu.Add("useRLC", new CheckBox("Use R"));
+            Menu.Add("rLimitLC", new Slider("R stack limit", 1, 1, 6));
+            Menu.Add("manaLC", new Slider("Do Lane Clear if mana is greater than :", 60, 1, 100));
+            Menu.AddSeparator();
             Menu.AddGroupLabel("Jungle Clear");
             Menu.Add("useWJG", new CheckBox("Use W"));
+            Menu.Add("useEJG", new CheckBox("Use E"));
+            Menu.Add("useRJG", new CheckBox("Use R"));
+            Menu.Add("rLimitJG", new Slider("R stack limit", 2, 1, 6));
+            Menu.Add("manaJG", new Slider("Do Jungle if mana is greater than :", 60, 1, 100));
+            Menu.AddSeparator();
             Menu.AddSeparator();
 
             Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
@@ -202,7 +233,130 @@ namespace KogMaw
                         }
                     }
                 }
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    if (useQH)
+                    {
+                        if (QIsReadyPerfectly())
+                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            {
+                                var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+                                if (target != null)
+                                    Q.Cast(target);
+                            }
+                    }
+
+                    if (useEH)
+                    {
+                        if (EIsReadyPerfectly())
+                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            {
+                                var target = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+                                if (target != null)
+                                    E.Cast(target);
+                            }
+                    }
+
+
+                    if (useRH)
+                    {
+                        if (RIsReadyPerfectly())
+                        {
+                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            {
+                                if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitH)
+                                {
+                                    var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
+                                    if (target != null)
+                                        R.Cast(target);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                {
+                    foreach (var minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, myHero.GetAutoAttackRange()))
+                    {
+                        if (useELC) {
+                            if (ObjectManager.Player.IsManaPercentOkay(manaLC)) 
+                            {
+                                if (EIsReadyPerfectly())
+                                {
+                                    var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, E.Range);
+                                    var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
+                                    if (farmLocation.HitNumber >= 3)
+                                        E.Cast(farmLocation.CastPosition);
+                                }
+                            }
+                        }
+
+                        if (useRLC) {
+                            if (ObjectManager.Player.IsManaPercentOkay(manaLC)) {
+                                if (RIsReadyPerfectly()) {
+                                    if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitLC)
+                                    {
+                                        var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, R.Range);
+                                        var farmLocation = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions, R.Width, (int)R.Range);
+                                        if (farmLocation.HitNumber >= 2) 
+                                        {
+                                            R.Cast(farmLocation.CastPosition);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (var jungleMobs in ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValidTarget(Program.W.Range) && o.Team == GameObjectTeam.Neutral && o.IsVisible && !o.IsDead))
+                    {
+
+                        if (WIsReadyPerfectly())
+                            if (useWJG)
+                                W.Cast();
+
+                        if (useEJG)
+                        {
+                            if (ObjectManager.Player.IsManaPercentOkay(manaJG))
+                            {
+                                if (EIsReadyPerfectly())
+                                {
+                                    var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(myHero.ServerPosition, E.Range);
+                                    var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
+                                    if (farmLocation.HitNumber >= 2)
+                                    {
+                                        E.Cast(farmLocation.CastPosition);
+                                    }
+                                }
+                            }
+                        }
+
+                        if (useRJG)
+                        {
+                            if (ObjectManager.Player.IsManaPercentOkay(manaJG))
+                            {
+                                if (RIsReadyPerfectly())
+                                {
+                                    if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitJG)
+                                    {
+                                        var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(myHero.ServerPosition, R.Range);
+                                        var farmLocation = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions, R.Width, (int)R.Range);
+                                        if (farmLocation.HitNumber >= 2)
+                                        {
+                                            R.Cast(farmLocation.CastPosition);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        internal static bool IsManaPercentOkay(this AIHeroClient hero, int manaPercent)
+        {
+            return myHero.ManaPercent > manaPercent;
         }
 
         internal static bool IsKillableAndValidTarget(this AIHeroClient target, double calculatedDamage, DamageType damageType, float distance = float.MaxValue)
@@ -215,43 +369,33 @@ namespace KogMaw
                 return false;
             }
 
-            // Tryndamere's Undying Rage (R)
             if (target.HasBuff("Undying Rage"))
             {
                 return false;
             }
 
-            // Kayle's Intervention (R)
             if (target.HasBuff("JudicatorIntervention"))
             {
                 return false;
             }
 
-            // Poppy's Diplomatic Immunity (R)
             if (target.HasBuff("DiplomaticImmunity") && !ObjectManager.Player.HasBuff("poppyulttargetmark"))
             {
-                //TODO: Get the actual target mark buff name
                 return false;
             }
 
-            // Banshee's Veil (PASSIVE)
             if (target.HasBuff("BansheesVeil"))
             {
-                // TODO: Get exact Banshee's Veil buff name.
                 return false;
             }
 
-            // Sivir's Spell Shield (E)
             if (target.HasBuff("SivirShield"))
             {
-                // TODO: Get exact Sivir's Spell Shield buff name
                 return false;
             }
 
-            // Nocturne's Shroud of Darkness (W)
             if (target.HasBuff("ShroudofDarkness"))
             {
-                // TODO: Get exact Nocturne's Shourd of Darkness buff name
                 return false;
             }
 
@@ -293,12 +437,17 @@ namespace KogMaw
                         if (args.Target.IsValidTarget(W.Range))
                             W.Cast();
             }
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
-                if (WIsReadyPerfectly())
-                    if (useWJG)
-                        if (EntityManager.MinionsAndMonsters.GetJungleMonsters().Count() >= 1)
-                            W.Cast();
+                foreach (var jungleMobs in ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValidTarget(Program.W.Range) && o.Team == GameObjectTeam.Neutral && o.IsVisible && !o.IsDead))
+                {
+                    if (jungleMobs.BaseSkinName == "SRU_Red" || jungleMobs.BaseSkinName == "SRU_Blue" || jungleMobs.BaseSkinName == "SRU_Gromp" || jungleMobs.BaseSkinName == "SRU_Murkwolf" || jungleMobs.BaseSkinName == "SRU_Razorbeak" || jungleMobs.BaseSkinName == "SRU_Krug" || jungleMobs.BaseSkinName == "Sru_Crab")
+                    {
+                        if (WIsReadyPerfectly())
+                            if (useWJG)
+                                W.Cast();
+                    }
+                }
             }
         }
     }
