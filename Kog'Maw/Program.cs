@@ -56,7 +56,7 @@ namespace KogMaw
         public static bool useRH { get { return Menu["useRH"].Cast<CheckBox>().CurrentValue; } }
         public static bool useELC { get { return Menu["useELC"].Cast<CheckBox>().CurrentValue; } }
         public static bool useRLC { get { return Menu["useRLC"].Cast<CheckBox>().CurrentValue; } }
-        public static bool human { get { return Menu["human"].Cast<CheckBox>().CurrentValue; } }
+        public static bool human { get { return Menu["human"].Cast<KeyBind>().CurrentValue; } }
         public static int esw { get { return Menu["esw"].Cast<Slider>().CurrentValue; } }
         public static int swatk { get { return Menu["swatk"].Cast<Slider>().CurrentValue; } }
         public static int swez { get { return Menu["swez"].Cast<Slider>().CurrentValue; } }
@@ -102,7 +102,7 @@ namespace KogMaw
             Menu.Add("rLimitJG", new Slider("R stack limit", 2, 1, 6));
             Menu.Add("manaJG", new Slider("Do Jungle if mana is greater than :", 60, 1, 100));
             Menu.AddSeparator();
-            Menu.Add("human", new CheckBox("Use Humanizer"));
+            Menu.Add("human", new KeyBind("Use Humanizer", false, KeyBind.BindTypes.PressToggle, 'T'));
             Menu.Add("esw", new Slider("Enable SWalk/NWalk at :", 225, 0, 500));
             Menu.Add("swatk", new Slider("SlowWalk ATKSPD cap :", 225, 0, 500));
             Menu.Add("swez", new Slider("SlowWalk Escape Zone :", 250, 0, 710));
