@@ -41,6 +41,7 @@ namespace KogMaw
         public static bool useR { get { return Menu["useR"].Cast<CheckBox>().CurrentValue; } }
         public static int rLimit { get { return Menu["rLimit"].Cast<Slider>().CurrentValue; } }
         public static bool manaW { get { return Menu["manaW"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useWJG { get { return Menu["useWJG"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         private static void OnLoad(EventArgs args)
@@ -58,10 +59,12 @@ namespace KogMaw
             Menu.Add("useW", new CheckBox("Use E"));
             Menu.Add("useE", new CheckBox("Use W"));
             Menu.Add("useR", new CheckBox("Use R"));
-            Menu.Add("rLimit", new Slider("R stack limit", 3, 1, 6));
             Menu.Add("manaW", new CheckBox("Keep Mana For W"));
+            Menu.Add("rLimit", new Slider("R stack limit", 3, 1, 6));
             Menu.AddSeparator();
-
+            Menu.AddGroupLabel("Jungle Clear");
+            Menu.Add("useWJG", new CheckBox("Use W"));
+            Menu.AddSeparator();
 
             Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
             W = new Spell.Active(SpellSlot.W, (uint)myHero.GetAutoAttackRange());
@@ -292,10 +295,10 @@ namespace KogMaw
             }
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
-                //if (WIsReadyPerfectly())
-                    //if (MenuProvider.Champion.Jungleclear.UseW)
-                        //if (EntityManager.MinionsAndMonsters.GetJungleMonsters().Count() >= 1)
-                            //W.Cast();
+                if (WIsReadyPerfectly())
+                    if (Menu.AddSeparator())
+                        if (EntityManager.MinionsAndMonsters.GetJungleMonsters().Count() >= 1)
+                            W.Cast();
             }
         }
     }
