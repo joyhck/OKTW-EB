@@ -296,7 +296,7 @@ namespace KogMaw
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
                 if (WIsReadyPerfectly())
-                    if (Menu.AddSeparator())
+                    if (useWJG)
                         if (EntityManager.MinionsAndMonsters.GetJungleMonsters().Count() >= 1)
                             W.Cast();
             }
