@@ -163,7 +163,6 @@ namespace LeeSin
         public static bool ElLeeSinIgniteKS { get { return Menu["ElLeeSin.Ignite.KS"].Cast<CheckBox>().CurrentValue; } }
         public static bool ElLeeSinSmiteQ { get { return Menu["ElLeeSin.Smite.Q"].Cast<CheckBox>().CurrentValue; } }
         public static int bonusRangeA { get { return Menu["bonusRangeA"].Cast<Slider>().CurrentValue; } }
-        public static int bonusRangeT { get { return Menu["bonusRangeT"].Cast<Slider>().CurrentValue; } }
         public static bool ElLeeSinLaneQ { get { return Menu["ElLeeSin.Lane.Q"].Cast<CheckBox>().CurrentValue; } }
         public static bool ElLeeSinLaneE { get { return Menu["ElLeeSin.Lane.E"].Cast<CheckBox>().CurrentValue; } }
         public static bool ElLeeSinJungleQ { get { return Menu["ElLeeSin.Jungle.Q"].Cast<CheckBox>().CurrentValue; } }
@@ -247,7 +246,6 @@ namespace LeeSin
             Menu.Add("ElLeeSin.Ignite.KS", new CheckBox("Use Ignite"));
             Menu.Add("ElLeeSin.Smite.Q", new CheckBox("Smite Q!", false));
             Menu.Add("bonusRangeA", new Slider("Ally Bonus Range", 0, 0, 1000));
-            Menu.Add("bonusRangeT", new Slider("Tower Bonus Range", 0, 0, 1000));
             Menu.AddSeparator();
 
             Q = new Spell.Skillshot(SpellSlot.Q, 1075, SkillShotType.Linear, 250, 1800, 60);
@@ -789,8 +787,7 @@ namespace LeeSin
 
         private static List<AIHeroClient> GetAllyHeroes(AIHeroClient position, int range)
         {
-            return
-                ObjectManager.Get<AIHeroClient>().Where(hero => hero.IsAlly && !hero.IsMe && !hero.IsDead && hero.Distance(position) < range).ToList();
+            return EntityManager.Heroes.Allies.Where(hero => hero.IsAlly && !hero.IsMe && !hero.IsDead && hero.Distance(position) < range).ToList();
         }
 
         private static void Harass()
@@ -936,20 +933,20 @@ namespace LeeSin
                     var insecPosition = InterceptionPoint(GetAllyInsec(GetAllyHeroes(target, 2000 + bonusRangeA)));
 
                     InsecLinePos = Drawing.WorldToScreen(insecPosition);
-                    return V2E(insecPosition, target.Position, target.Distance(insecPosition) + 210).To3D();
+                    return V2E(insecPosition, target.Position, target.Distance(insecPosition) + 225).To3D();
                 }
 
                 if (ElLeeSinInsecOriginalPos)
                 {
                     InsecLinePos = Drawing.WorldToScreen(insecPos);
-                    return V2E(insecPos, target.Position, target.Distance(insecPos) + 210).To3D();
+                    return V2E(insecPos, target.Position, target.Distance(insecPos) + 225).To3D();
                 }
 
                 if (insecmouse)
                 {
                     InsecLinePos = Drawing.WorldToScreen(Game.CursorPos);
 
-                    return V2E(Game.CursorPos, target.Position, target.Distance(insecPos) + 210).To3D();
+                    return V2E(Game.CursorPos, target.Position, target.Distance(insecPos) + 225).To3D();
                 }
             }
 
@@ -1055,14 +1052,15 @@ namespace LeeSin
                 }
                 if (minions)
                 {
-                    var minion2 = (from minion in ObjectManager.Get<Obj_AI_Minion>() where minion.IsAlly && minion.Distance(myHero) < W.Range && minion.Distance(pos) < 200 && !minion.Name.ToLower().Contains("ward") select minion).ToList();
+                    var minion2 = (from minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Ally) where minion.IsAlly && minion.Distance(myHero) < W.Range && minion.Distance(pos) < 200 && !minion.Name.ToLower().Contains("ward") select minion).ToList();
                     if (minion2.Count > 0 && WStage == WCastStage.First)
                     {
+                        /*
                         if (500 >= Environment.TickCount - wcasttime || WStage != WCastStage.First)
                         {
                             return;
                         }
-
+                        */
                         CastW(minion2[0]);
                         return;
                     }
