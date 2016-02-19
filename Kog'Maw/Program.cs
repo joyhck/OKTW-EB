@@ -77,8 +77,8 @@ namespace KogMaw
             Menu.AddSeparator();
             Menu.AddGroupLabel("Combo");
             Menu.Add("useQ", new CheckBox("Use Q"));
-            Menu.Add("useW", new CheckBox("Use E"));
-            Menu.Add("useE", new CheckBox("Use W"));
+            Menu.Add("useW", new CheckBox("Use W"));
+            Menu.Add("useE", new CheckBox("Use E"));
             Menu.Add("useR", new CheckBox("Use R"));
             Menu.Add("manaW", new CheckBox("Keep Mana For W"));
             Menu.Add("dontw", new KeyBind("Don't move in combo", false, KeyBind.BindTypes.PressToggle, 'A'));
