@@ -279,7 +279,6 @@ namespace LeeSin
                 smiteSlot = new Spell.Targeted(smite.Slot, 500);
             }
 
-            Drawing.OnDraw += OnDraw;
             Game.OnTick += OnTick;
 
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
@@ -307,7 +306,7 @@ namespace LeeSin
                 return;
             }
 
-            var asec = ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy && a.Distance(Game.CursorPos) < 200 && a.IsValid && !a.IsDead);
+            var asec = EntityManager.Heroes.Enemies.Where(a => a.IsEnemy && a.Distance(Game.CursorPos) < 200 && a.IsValid && !a.IsDead);
 
             if (asec.Any())
             {
@@ -483,7 +482,7 @@ namespace LeeSin
                 float leeSinRKickDistance = 700;
                 float leeSinRKickWidth = 100;
                 var minREnemies = ElLeeSinComboRCount;
-                foreach (var enemy in EntityManager.Heroes.Enemies) // pray .Where(x => x.IsValidTarget(2500))
+                foreach (var enemy in EntityManager.Heroes.Enemies)
                 {
                     var startPos = enemy.ServerPosition;
                     var endPos = myHero.ServerPosition.Extend(startPos, myHero.Distance(enemy) + leeSinRKickDistance);
@@ -550,7 +549,7 @@ namespace LeeSin
 
             if (W.IsReady() && ElLeeSinJungleW)
             {
-                if (WState)// && minion.Distance(myHero) < myHero.GetAutoAttackRange())
+                if (WState)
                 {
                     W.Cast(myHero);
                     LastSpell = Environment.TickCount;
@@ -616,9 +615,6 @@ namespace LeeSin
         {
             var target = TargetSelector.GetTarget(1500, DamageType.Physical);
 
-            // What the fuck is this for :
-            //Orbwalking.Orbwalk(target ?? null, Game.CursorPos, InitMenu.Menu.Item("ExtraWindup").GetValue<Slider>().Value, InitMenu.Menu.Item("HoldPosRadius").GetValue<Slider>().Value);
-
             Orbwalker.OrbwalkTo(Game.CursorPos);
 
             if (target == null)
@@ -657,10 +653,6 @@ namespace LeeSin
             }
         }
 
-        private static void OnDraw(EventArgs args)
-        {
-        }
-
         private static void OnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
 
@@ -688,11 +680,6 @@ namespace LeeSin
                 if (target == null)
                 {
                     return;
-                }
-
-                if (args.SData.Name == "BlindMonkRKick" && !(myHero.GetSpellDamage(target, SpellSlot.R) > target.Health) && ElLeeSinInsecUseInstaFlash)
-                {
-                    //Core.DelayAction(delegate { flashSlot.Cast(GetInsecPos(target)); }, 80);
                 }
             }
 
@@ -1055,12 +1042,6 @@ namespace LeeSin
                     var minion2 = (from minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Ally) where minion.IsAlly && minion.Distance(myHero) < W.Range && minion.Distance(pos) < 200 && !minion.Name.ToLower().Contains("ward") select minion).ToList();
                     if (minion2.Count > 0 && WStage == WCastStage.First)
                     {
-                        /*
-                        if (500 >= Environment.TickCount - wcasttime || WStage != WCastStage.First)
-                        {
-                            return;
-                        }
-                        */
                         CastW(minion2[0]);
                         return;
                     }
@@ -1135,6 +1116,7 @@ namespace LeeSin
 
         private static void UseItems(Obj_AI_Base target)
         {
+            if (target == null) { return; }
             if (Item.CanUseItem(ItemId.Ravenous_Hydra_Melee_Only) && 400 > myHero.Distance(target))
             {
                 Item.UseItem(ItemId.Ravenous_Hydra_Melee_Only);
