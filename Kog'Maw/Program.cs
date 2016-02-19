@@ -22,8 +22,8 @@ namespace KogMaw
 
         private static Menu Menu;
 
-        private static bool IsZombie = ObjectManager.Player.HasBuff("kogmawicathiansurprise");
-        private static bool wActive = ObjectManager.Player.HasBuff("kogmawbioarcanebarrage");
+        private static bool IsZombie = myHero.HasBuff("kogmawicathiansurprise");
+        private static bool wActive = myHero.HasBuff("kogmawbioarcanebarrage");
 
         private static AIHeroClient myHero
         {
@@ -61,6 +61,7 @@ namespace KogMaw
         public static int swatk { get { return Menu["swatk"].Cast<Slider>().CurrentValue; } }
         public static int swez { get { return Menu["swez"].Cast<Slider>().CurrentValue; } }
         public static int swchz { get { return Menu["swchz"].Cast<Slider>().CurrentValue; } }
+        public static bool dontw { get { return Menu["dontw"].Cast<KeyBind>().CurrentValue; } }
 
         #endregion
 
@@ -80,6 +81,7 @@ namespace KogMaw
             Menu.Add("useE", new CheckBox("Use W"));
             Menu.Add("useR", new CheckBox("Use R"));
             Menu.Add("manaW", new CheckBox("Keep Mana For W"));
+            Menu.Add("dontw", new KeyBind("Don't move in combo", false, KeyBind.BindTypes.PressToggle, 'A'));
             Menu.Add("rLimit", new Slider("R stack limit", 3, 1, 6));
             Menu.AddSeparator();
             Menu.AddGroupLabel("Harass");
@@ -166,14 +168,14 @@ namespace KogMaw
 
         private static void OnTick(EventArgs args)
         {
-            if (ObjectManager.Player.IsDead) return;
+            if (myHero.IsDead) return;
 
             W = new Spell.Active(SpellSlot.W, (uint)(565 + 60 + W.Level * 30 + 65));
             R = new Spell.Skillshot(SpellSlot.R, (uint)(900 + R.Level * 300), SkillShotType.Circular, 1500, int.MaxValue, 225);
 
             if (human && wActive)
             {
-                if (1 / ObjectManager.Player.AttackDelay > Convert.ToSingle(esw) / 100)
+                if (1 / myHero.AttackDelay > Convert.ToSingle(esw) / 100)
                 {
                     if (EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swez)) || !(EntityManager.Heroes.Enemies.Any(x => x.IsValidTarget(130 + swchz))))
                     {
@@ -208,7 +210,7 @@ namespace KogMaw
                     {
                         if (QIsReadyPerfectly())
                         {
-                            if (manaW && W.Level > 0 ? ObjectManager.Player.Mana - getSpellMana(SpellSlot.Q) >= getSpellMana(SpellSlot.W) : true)
+                            if (manaW && W.Level > 0 ? myHero.Mana - getSpellMana(SpellSlot.Q) >= getSpellMana(SpellSlot.W) : true)
                             {
                                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
                                 if (target != null)
@@ -237,7 +239,7 @@ namespace KogMaw
                     {
                         if (EIsReadyPerfectly())
                         {
-                            if (manaW && W.Level > 0 ? ObjectManager.Player.Mana - getSpellMana(SpellSlot.E) >= getSpellMana(SpellSlot.W) : true)
+                            if (manaW && W.Level > 0 ? myHero.Mana - getSpellMana(SpellSlot.E) >= getSpellMana(SpellSlot.W) : true)
                             {
                                 var target = TargetSelector.GetTarget(E.Range, DamageType.Magical);
                                 if (target != null)
@@ -254,9 +256,9 @@ namespace KogMaw
 
                         if (RIsReadyPerfectly())
                         {
-                            if (manaW && W.Level > 0 ? ObjectManager.Player.Mana - getSpellMana(SpellSlot.R) >= getSpellMana(SpellSlot.W) : true)
+                            if (manaW && W.Level > 0 ? myHero.Mana - getSpellMana(SpellSlot.R) >= getSpellMana(SpellSlot.W) : true)
                             {
-                                if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimit)
+                                if (myHero.GetBuffCount("kogmawlivingartillerycost") < rLimit)
                                 {
                                     var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                                     if (target != null)
@@ -277,7 +279,7 @@ namespace KogMaw
                     if (useQH)
                     {
                         if (QIsReadyPerfectly())
-                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            if (myHero.IsManaPercentOkay(manaH))
                             {
                                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
                                 if (target != null)
@@ -288,7 +290,7 @@ namespace KogMaw
                     if (useEH)
                     {
                         if (EIsReadyPerfectly())
-                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            if (myHero.IsManaPercentOkay(manaH))
                             {
                                 var target = TargetSelector.GetTarget(E.Range, DamageType.Magical);
                                 if (target != null)
@@ -301,9 +303,9 @@ namespace KogMaw
                     {
                         if (RIsReadyPerfectly())
                         {
-                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                            if (myHero.IsManaPercentOkay(manaH))
                             {
-                                if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitH)
+                                if (myHero.GetBuffCount("kogmawlivingartillerycost") < rLimitH)
                                 {
                                     var target = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                                     if (target != null)
@@ -319,7 +321,7 @@ namespace KogMaw
                     {
                         if (useELC)
                         {
-                            if (ObjectManager.Player.IsManaPercentOkay(manaLC))
+                            if (myHero.IsManaPercentOkay(manaLC))
                             {
                                 if (EIsReadyPerfectly())
                                 {
@@ -333,11 +335,11 @@ namespace KogMaw
 
                         if (useRLC)
                         {
-                            if (ObjectManager.Player.IsManaPercentOkay(manaLC))
+                            if (myHero.IsManaPercentOkay(manaLC))
                             {
                                 if (RIsReadyPerfectly())
                                 {
-                                    if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitLC)
+                                    if (myHero.GetBuffCount("kogmawlivingartillerycost") < rLimitLC)
                                     {
                                         var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, R.Range);
                                         var farmLocation = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions, R.Width, (int)R.Range);
@@ -360,7 +362,7 @@ namespace KogMaw
 
                         if (useEJG)
                         {
-                            if (ObjectManager.Player.IsManaPercentOkay(manaJG))
+                            if (myHero.IsManaPercentOkay(manaJG))
                             {
                                 if (EIsReadyPerfectly())
                                 {
@@ -376,11 +378,11 @@ namespace KogMaw
 
                         if (useRJG)
                         {
-                            if (ObjectManager.Player.IsManaPercentOkay(manaJG))
+                            if (myHero.IsManaPercentOkay(manaJG))
                             {
                                 if (RIsReadyPerfectly())
                                 {
-                                    if (ObjectManager.Player.GetBuffCount("kogmawlivingartillerycost") < rLimitJG)
+                                    if (myHero.GetBuffCount("kogmawlivingartillerycost") < rLimitJG)
                                     {
                                         var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(myHero.ServerPosition, R.Range);
                                         var farmLocation = EntityManager.MinionsAndMonsters.GetCircularFarmLocation(minions, R.Width, (int)R.Range);
@@ -422,7 +424,7 @@ namespace KogMaw
                 return false;
             }
 
-            if (target.HasBuff("DiplomaticImmunity") && !ObjectManager.Player.HasBuff("poppyulttargetmark"))
+            if (target.HasBuff("DiplomaticImmunity") && !myHero.HasBuff("poppyulttargetmark"))
             {
                 return false;
             }
@@ -442,7 +444,7 @@ namespace KogMaw
                 return false;
             }
 
-            if (ObjectManager.Player.HasBuff("summonerexhaust"))
+            if (myHero.HasBuff("summonerexhaust"))
                 calculatedDamage *= 0.6;
 
             if (target.ChampionName == "Blitzcrank")
@@ -464,6 +466,20 @@ namespace KogMaw
 
         private static void OnDraw(EventArgs args)
         {
+            if (dontw && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && Orbwalker.DisableMovement == false)
+            {
+                Orbwalker.DisableMovement = true;
+                Player.IssueOrder(GameObjectOrder.Stop, myHero);
+            }
+
+            if (!dontw || !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            {
+                Orbwalker.DisableMovement = false;
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && dontw)
+            {
+                Drawing.DrawText(Drawing.Width * 0.5f, Drawing.Height * 0.3f, System.Drawing.Color.Orange, "Not moving when W is active is on.", 50);
+            }
         }
 
         private static void OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
