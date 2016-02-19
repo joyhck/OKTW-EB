@@ -158,16 +158,6 @@ namespace RevampedDraven
         {
             if (!myHero.IsDead)
             {
-                if (ObjectManager.Get<GameObject>().Any(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")))
-                {
-                    var bestObject = ObjectManager.Get<GameObject>().First(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy"));
-                    if (bestObject == null)
-                    {
-                        Orbwalker.DisableAttacking = false;
-                        Orbwalker.DisableMovement = false;
-                    }
-                }
-
                 if (drawe && EIsReadyPerfectly())
                     Drawing.DrawCircle(myHero.Position, E.Range, Color.Red);
 
@@ -342,6 +332,10 @@ namespace RevampedDraven
                                 Core.DelayAction(delegate { Orbwalker.DisableMovement = false; }, 50);
                             }
                         }
+                    }
+                    else
+                    {
+                        Orbwalker.DisableMovement = false;
                     }
                 }
 
