@@ -158,6 +158,16 @@ namespace RevampedDraven
         {
             if (!myHero.IsDead)
             {
+                if (ObjectManager.Get<GameObject>().Any(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")))
+                {
+                    var bestObject = ObjectManager.Get<GameObject>().First(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy"));
+                    if (bestObject == null)
+                    {
+                        Orbwalker.DisableAttacking = false;
+                        Orbwalker.DisableMovement = false;
+                    }
+                }
+
                 if (drawe && EIsReadyPerfectly())
                     Drawing.DrawCircle(myHero.Position, E.Range, Color.Red);
 
@@ -316,71 +326,22 @@ namespace RevampedDraven
         {
             if (!myHero.IsDead)
             {
-                if (catchaxe)
-                {
-                    var bestObject = _axeDropObjectDataList.Where(x => x.Object.IsValid).OrderBy(x => x.ExpireTime).FirstOrDefault(x => Game.CursorPos.Distance(x.Object.Position) <= catchaxerange);
-                    if (bestObject != null)
+                var bestObjecta = _axeDropObjectDataList.Where(x => x.Object.IsValid).OrderBy(x => x.ExpireTime).FirstOrDefault();
+
+                if (catchaxe) {
+                    if (bestObjecta != null)
                     {
-                        _bestDropObject = bestObject.Object;
-
-                        if (myHero.GetPath(bestObject.Object.Position).ToList().FirstOrDefault().To2D().Distance(bestObject.Object.Position) / myHero.MoveSpeed + Environment.TickCount >= bestObject.ExpireTime)
+                        if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
                         {
-                            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                            {
-                                if (useW)
-                                {
-                                    W.Cast();
-                                }
-                            }
-                        }
-
-                        if (bestObject != null)
-                        {
-                            if (myHero.CanAttack)
-                            {
-                                Orbwalker.DisableAttacking = false;
-                            }
-                            else
-                            {
-                                Orbwalker.DisableAttacking = true;
-                            }
-                            if (myHero.CanMove)
+                            if (bestObjecta.Object.Position.Distance(myHero.ServerPosition) >= 0f)
                             {
                                 Orbwalker.DisableMovement = false;
-                            }
-                            else
-                            {
+                                Orbwalker.OrbwalkTo(bestObjecta.Object.Position);
                                 Orbwalker.DisableMovement = true;
-                                return;
-                            }
-                            if (bestObject.Object.Position.Distance(myHero.Position) < 130)
-                            {
-                                if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
-                                {
-                                    Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-                                }
-                            }
-                            else
-                            {
-                                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
-                                {
-                                    Orbwalker.OrbwalkTo(bestObject.Object.Position);
-                                }
-                                else
-                                {
-                                    Orbwalker.OrbwalkTo(bestObject.Object.Position);
-                                }
+
+                                Core.DelayAction(delegate { Orbwalker.DisableMovement = false; }, 50);
                             }
                         }
-                        else
-                        {
-                            Orbwalker.DisableMovement = false;
-                            Orbwalker.DisableAttacking = false;
-                        }
-                    }
-                    else
-                    {
-                        _bestDropObject = null;
                     }
                 }
 
