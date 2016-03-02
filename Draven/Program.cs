@@ -78,6 +78,9 @@ namespace RevampedDraven
 
         public static bool useQLC { get { return Menu["useQLC"].Cast<CheckBox>().CurrentValue; } }
         public static bool useQJG { get { return Menu["useQJG"].Cast<CheckBox>().CurrentValue; } }
+
+        public static bool onlycatch { get { return Menu["onlycatch"].Cast<CheckBox>().CurrentValue; } }
+
         #endregion
 
         private static void OnLoad(EventArgs args)
@@ -119,6 +122,7 @@ namespace RevampedDraven
             Menu.Add("interrupt", new CheckBox("Interrupter", true));
             Menu.Add("gapcloser", new CheckBox("Gapcloser", true));
             Menu.Add("catchaxe", new CheckBox("Auto Catch Axe", true));
+            Menu.Add("onlycatch", new CheckBox("Only catch when orbwalking?", true));
             Menu.AddSeparator();
             Menu.Add("drawe", new CheckBox("Draw E", true));
             Menu.Add("drawr", new CheckBox("Draw R", true));
@@ -319,30 +323,67 @@ namespace RevampedDraven
                 var bestObjecta = _axeDropObjectDataList.Where(x => x.Object.IsValid).OrderBy(x => x.ExpireTime).FirstOrDefault();
 
                 if (catchaxe) {
-                    if (bestObjecta != null)
-                    {
-                        if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
+                    if (onlycatch) {
+                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
                         {
-                            if (ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position.Distance(myHero.ServerPosition) <= 80f)
+                            return;
+                        }
+                        else
+                        {
+                            if (bestObjecta != null)
                             {
-                                Orbwalker.DisableMovement = true;
-                                Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
-                                Orbwalker.DisableMovement = false;
-                                return;
+                                if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
+                                {
+                                    if (ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position.Distance(myHero.ServerPosition) <= 80f)
+                                    {
+                                        Orbwalker.DisableMovement = true;
+                                        Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
+                                        Orbwalker.DisableMovement = false;
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Orbwalker.DisableMovement = false;
+                                        Orbwalker.DisableAttacking = true;
+                                        Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
+                                        Orbwalker.DisableMovement = true;
+                                        Orbwalker.DisableAttacking = false;
+                                    }
+                                }
                             }
                             else
                             {
                                 Orbwalker.DisableMovement = false;
-                                Orbwalker.DisableAttacking = true;
-                                Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
-                                Orbwalker.DisableMovement = true;
-                                Orbwalker.DisableAttacking = false;
                             }
                         }
                     }
                     else
                     {
-                        Orbwalker.DisableMovement = false;
+                        if (bestObjecta != null)
+                        {
+                            if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
+                            {
+                                if (ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position.Distance(myHero.ServerPosition) <= 80f)
+                                {
+                                    Orbwalker.DisableMovement = true;
+                                    Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
+                                    Orbwalker.DisableMovement = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    Orbwalker.DisableMovement = false;
+                                    Orbwalker.DisableAttacking = true;
+                                    Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
+                                    Orbwalker.DisableMovement = true;
+                                    Orbwalker.DisableAttacking = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Orbwalker.DisableMovement = false;
+                        }
                     }
                 }
 
