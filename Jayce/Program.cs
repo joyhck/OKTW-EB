@@ -30,7 +30,7 @@ namespace OKTWJayce
 
         private static Menu Menu;
 
-        private static bool Range { get { return Q.Name.Contains("jayceshockblast"); } }
+        private static bool Range { get { return myHero.HasBuff("jaycestancegun"); } }
 
         private static AIHeroClient myHero
         {
