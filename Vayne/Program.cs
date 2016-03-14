@@ -64,33 +64,55 @@ namespace Vayne
         private static void Clean()
         {
             if (Item.CanUseItem(ItemId.Quicksilver_Sash))
+            {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Quicksilver_Sash); }, CSSDelay);
+            }
             else if (Item.CanUseItem(ItemId.Mercurial_Scimitar))
+            {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Mercurial_Scimitar); }, CSSDelay);
+            }
             else if (Item.CanUseItem(ItemId.Dervish_Blade))
+            {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Dervish_Blade); }, CSSDelay);
+            }
             else if (cleanse != null && cleanse.IsReady())
+            {
                 Core.DelayAction(delegate { cleanse.Cast(); }, CSSDelay);
+            }
         }
 
         private static void Cleansers()
         {
-            var target = TargetSelector.GetTarget(550, DamageType.Physical);
-
-            if (target == null) { return; }
-
-            if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade) && !cleanse.IsReady())
+            if (!_Clean)
             {
                 return;
             }
 
-            if (myHero.HealthPercent >= (float)cleanHP || !_Clean)
+            var target = TargetSelector.GetTarget(550, DamageType.Physical);
+
+            if (target == null) { return; }
+
+            if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade))
+            {
                 return;
+            }
+
+            if (!Item.HasItem(ItemId.Quicksilver_Sash) && !Item.HasItem(ItemId.Mikaels_Crucible) && !Item.HasItem(ItemId.Mercurial_Scimitar) && !Item.HasItem(ItemId.Dervish_Blade))
+            {
+                return;
+            }
+
+            if (myHero.HealthPercent >= cleanHP)
+            {
+                return;
+            }
 
             if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague"))
+            {
                 Clean();
+            }
 
-            if (Item.CanUseItem(ItemId.Mikaels_Crucible))
+            if (Item.CanUseItem(ItemId.Mikaels_Crucible) && Item.HasItem(ItemId.Mikaels_Crucible))
             {
                 foreach (var ally in EntityManager.Heroes.Allies.Where(ally => ally.IsValid && !ally.IsDead && ItemMenu["MikaelsAlly" + ally.ChampionName].Cast<CheckBox>().CurrentValue && myHero.Distance(ally.Position) < 750 && ally.HealthPercent < (float)cleanHP))
                 {
@@ -135,8 +157,10 @@ namespace Vayne
 
         public static void OnUpdate(EventArgs args)
         {
-
-            //Cleansers();
+            if (_Clean)
+            {
+                Cleansers();
+            }
 
             if (Item.CanUseItem(ItemId.Blade_of_the_Ruined_King) && useBotrk)
             {
