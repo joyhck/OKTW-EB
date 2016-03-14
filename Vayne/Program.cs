@@ -106,16 +106,20 @@ namespace Vayne
                 return;
             }
 
-            if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague"))
+            if (CleanSpells)
             {
-                Clean();
+                if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague"))
+                {
+                    Clean();
+                }
             }
+
 
             if (Item.CanUseItem(ItemId.Mikaels_Crucible) && Item.HasItem(ItemId.Mikaels_Crucible))
             {
                 foreach (var ally in EntityManager.Heroes.Allies.Where(ally => ally.IsValid && !ally.IsDead && ItemMenu["MikaelsAlly" + ally.ChampionName].Cast<CheckBox>().CurrentValue && myHero.Distance(ally.Position) < 750 && ally.HealthPercent < (float)cleanHP))
                 {
-                    if (ally.HasBuff("zedrdeathmark") || ally.HasBuff("FizzMarinerDoom") || ally.HasBuff("MordekaiserChildrenOfTheGrave") || ally.HasBuff("PoppyDiplomaticImmunity") || ally.HasBuff("VladimirHemoplague"))
+                    if (CleanSpells && ally.HasBuff("zedrdeathmark") || ally.HasBuff("FizzMarinerDoom") || ally.HasBuff("MordekaiserChildrenOfTheGrave") || ally.HasBuff("PoppyDiplomaticImmunity") || ally.HasBuff("VladimirHemoplague"))
                         Item.UseItem(ItemId.Mikaels_Crucible, ally);
                     if (ally.HasBuffOfType(BuffType.Stun) && Stun)
                         Item.UseItem(ItemId.Mikaels_Crucible, ally);
@@ -364,7 +368,8 @@ namespace Vayne
 
         static void Drawing_OnDraw(EventArgs args)
         {
-            if (menuKey) {
+            if (menuKey)
+            {
                 var x = myHero.HPBarPosition.X;
                 var y = myHero.HPBarPosition.Y + 200;
                 if (UseRBool)
@@ -691,7 +696,6 @@ namespace Vayne
                 return Vector3.Zero;
             }
 
-            const int currentStep = 45;
             var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
             for (var i = 0f; i < 360f; i += 45)
             {
@@ -987,11 +991,6 @@ namespace Vayne
             return list;
         }
 
-        public static BuffInstance GetWBuff(this AIHeroClient target)
-        {
-            return target.Buffs.FirstOrDefault(bu => bu.Name == "vaynesilvereddebuff");
-        }
-
         public static List<Vector3> GetRotatedQPositions()
         {
             const int currentStep = 30;
@@ -1045,61 +1044,6 @@ namespace Vayne
             return -1;
         }
 
-        public static Obj_AI_Base GetCondemnTarget(Vector3 fromPosition)
-        {
-            return GetTargetVHR(fromPosition);
-        }
-
-        public static Obj_AI_Base GetTargetVHR(Vector3 fromPosition)
-        {
-            var HeroList = EntityManager.Heroes.Enemies.Where(h => h.IsValidTarget(E.Range) && !h.HasBuffOfType(BuffType.SpellShield) && !h.HasBuffOfType(BuffType.SpellImmunity));
-
-            var MinChecksPercent = 25;
-            var PushDistance = EPushDistanceSlider;
-
-            if (PushDistance >= 410)
-            {
-                var PushEx = PushDistance;
-                PushDistance -= (10 + (PushEx - 410) / 2);
-            }
-
-            if (ObjectManager.Player.ServerPosition.UnderTurret(true))
-            {
-                return null;
-            }
-
-            foreach (var Hero in HeroList)
-            {
-                if (Hero.NetworkId != TargetSelector.SelectedTarget.NetworkId)
-                {
-                    continue;
-                }
-
-                if (Hero.Health + 10 <= ObjectManager.Player.GetAutoAttackDamage(Hero) * 2)
-                {
-                    continue;
-                }
-
-                var targetPosition = E2.GetPrediction(Hero).UnitPosition;
-                var finalPosition = targetPosition.Extend(ObjectManager.Player.ServerPosition, -PushDistance);
-                var finalPosition_ex = Hero.ServerPosition.Extend(ObjectManager.Player.ServerPosition, -PushDistance);
-
-                var condemnRectangle = new VHRPolygon(VHRPolygon.Rectangle(targetPosition.To2D(), finalPosition, Hero.BoundingRadius));
-                var condemnRectangle_ex = new VHRPolygon(VHRPolygon.Rectangle(Hero.ServerPosition.To2D(), finalPosition_ex, Hero.BoundingRadius));
-
-                if (IsBothNearWall(Hero))
-                {
-                    return null;
-                }
-
-                if (condemnRectangle.Points.Count(point => NavMesh.GetCollisionFlags(point.X, point.Y).HasFlag(CollisionFlags.Wall)) >= condemnRectangle.Points.Count() * (MinChecksPercent / 100f) && condemnRectangle_ex.Points.Count(point => NavMesh.GetCollisionFlags(point.X, point.Y).HasFlag(CollisionFlags.Wall)) >= condemnRectangle_ex.Points.Count() * (MinChecksPercent / 100f))
-                {
-                    return Hero;
-                }
-            }
-            return null;
-        }
-
         private static Vector3[] GetWallQPositions(Obj_AI_Base player, float Range)
         {
             Vector3[] vList =
@@ -1121,36 +1065,6 @@ namespace Vayne
                 return true;
             }
             return false;
-        }
-
-        public static List<Vector3> GetSmartQPosition()
-        {
-            //if (!smartq || !E.IsReady())
-            //{
-            //return Vector3.Zero;
-            //}
-
-            const int currentStep = 30;
-            var direction = (Game.CursorPos - ObjectManager.Player.ServerPosition).Normalized().To2D();
-
-            var list = new List<Vector3>();
-            for (var i = -0; i <= 360; i += currentStep)
-            {
-                var angleRad = DegreeToRadian(i);
-                var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
-                list.Add(rotatedPosition.To3D());
-            }
-            return list;
-        }
-
-        public static List<AIHeroClient> GetLhEnemiesNear(this Vector3 position, float range, float healthpercent)
-        {
-            return EntityManager.Heroes.Enemies.Where(hero => hero.IsValidTarget(range, true, position) && hero.HealthPercent <= healthpercent).ToList();
-        }
-
-        public static bool UnderAllyTurret_Ex(this Vector3 position)
-        {
-            return ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && !t.IsDead);
         }
 
         public static IEnumerable<AIHeroClient> EnemiesClose
@@ -1235,7 +1149,6 @@ namespace Vayne
         public static bool useCutlass { get { return ItemMenu["useCutlass"].Cast<CheckBox>().CurrentValue; } }
         public static bool useGhostBlade { get { return ItemMenu["useGhostBlade"].Cast<CheckBox>().CurrentValue; } }
         public static bool smartq { get { return QSettings["smartq"].Cast<CheckBox>().CurrentValue; } }
-        public static bool wstacks2 { get { return QSettings["2wstacks"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
@@ -1842,19 +1755,6 @@ namespace Vayne
             return pList.Count > 1 ? pList.OrderByDescending(el => el.Distance(cursorPos)).FirstOrDefault() : Vector3.Zero;
         }
 
-        public static int VayneWStacks(Obj_AI_Base o)
-        {
-            if (o == null) return 0;
-            if (o.Buffs.FirstOrDefault(b => b.Name.Contains("vaynesilver")) == null || !o.Buffs.Any(b => b.Name.Contains("vaynesilver"))) return 0;
-            return o.Buffs.FirstOrDefault(b => b.Name.Contains("vaynesilver")).Count;
-        }
-
-        public static Vector3 Randomize(Vector3 pos)
-        {
-            var r = new Random(Environment.TickCount);
-            return new Vector2(pos.X + r.Next(-150, 150), pos.Y + r.Next(-150, 150)).To3D();
-        }
-
         public static bool UnderTurret(this Obj_AI_Base unit)
         {
             return UnderTurret(unit.Position, true);
@@ -1875,27 +1775,10 @@ namespace Vayne
             return EntityManager.Heroes.Enemies.Any(e => e.IsValidTarget() && (e.Distance(pos) < 375) && (e.GetWaypoints().LastOrDefault().Distance(pos) > 550)) || (pos.UnderTurret(true) && !myHero.UnderTurret(true));
         }
 
-        public static bool IsKillable(AIHeroClient hero)
-        {
-            return myHero.GetAutoAttackDamage(hero) * 2 < hero.Health;
-        }
-
         public static bool IsCollisionable(Vector3 pos)
         {
             return NavMesh.GetCollisionFlags(pos).HasFlag(CollisionFlags.Wall) || (NavMesh.GetCollisionFlags(pos).HasFlag(CollisionFlags.Building));
         }
-
-        public static bool IsValidState(AIHeroClient target)
-        {
-            return !target.HasBuffOfType(BuffType.SpellShield) && !target.HasBuffOfType(BuffType.SpellImmunity) && !target.HasBuffOfType(BuffType.Invulnerability);
-        }
-
-        public static int CountHerosInRange(AIHeroClient target, bool checkteam, float range = 1200f)
-        {
-            var objListTeam = ObjectManager.Get<AIHeroClient>().Where(x => x.IsValidTarget(range, false));
-            return objListTeam.Count(hero => checkteam ? hero.Team != target.Team : hero.Team == target.Team);
-        }
-
         #endregion
     }
 
