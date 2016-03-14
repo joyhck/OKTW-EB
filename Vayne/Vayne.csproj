@@ -65,8 +65,12 @@
     <Compile Include="Evadespells\EvadeSpellData.cs" />
     <Compile Include="Evadespells\EvadeSpellDatabase.cs" />
     <Compile Include="Geometry.cs" />
+    <Compile Include="SOLOVayne.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WardTracker.cs\WardDetector.cs" />
+    <Compile Include="WardTracker.cs\WardTrackerVariables.cs" />
+    <Compile Include="YasuoWall.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
