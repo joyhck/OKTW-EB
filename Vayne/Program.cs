@@ -555,18 +555,77 @@ namespace Vayne
                                     }
                                 }
                                 break;
+                            case 6: // Cursor
+                                var smartQPosition = GetSmartQPosition();
+                                var smartQCheck = smartQPosition != Vector3.Zero;
+                                var QPosition = smartQCheck ? smartQPosition : Game.CursorPos;
+                                var afterTumblePosition = ObjectManager.Player.ServerPosition.Extend(QPosition, 300f);
+                                var distanceToTarget = afterTumblePosition.Distance(target.Position, true);
+                                if ((distanceToTarget < Math.Pow(ObjectManager.Player.AttackRange + 65, 2) && distanceToTarget > 110 * 110) || Cqspam)
+                                {
+                                    DefaultQCast(QPosition, tg);
+                                }
+                                break;
+                            case 7: // Kite Melee
+                                var _smartQPosition = GetSmartQPosition();
+                                var _smartQCheck = _smartQPosition != Vector3.Zero;
+                                var _QPosition = _smartQCheck ? _smartQPosition : Game.CursorPos;
+                                var _afterTumblePosition = ObjectManager.Player.ServerPosition.Extend(_QPosition, 300f);
+                                var _distanceToTarget = _afterTumblePosition.Distance(target.Position, true);
+                                if ((_distanceToTarget < Math.Pow(ObjectManager.Player.AttackRange + 65, 2) && _distanceToTarget > 110 * 110) || Cqspam)
+                                {
+                                    if (MeleeEnemiesTowardsMe.Any() && !MeleeEnemiesTowardsMe.All(m => m.HealthPercent <= 15))
+                                    {
+                                        var Closest = MeleeEnemiesTowardsMe.OrderBy(m => m.Distance(ObjectManager.Player)).First();
+                                        var whereToQ = Closest.ServerPosition.Extend(ObjectManager.Player.ServerPosition, Closest.Distance(ObjectManager.Player) + 300f).To3D();
+                                        if (whereToQ.IsSafe())
+                                        {
+                                            CastQ(whereToQ);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        DefaultQCast(_QPosition, tg);
+                                    }
+                                }
+                                break;
+                            case 8: // Kurisu
+                                var __smartQPosition = GetSmartQPosition();
+                                var __smartQCheck = __smartQPosition != Vector3.Zero;
+                                var __QPosition = __smartQCheck ? __smartQPosition : Game.CursorPos;
+                                var __afterTumblePosition = ObjectManager.Player.ServerPosition.Extend(__QPosition, 300f);
+                                var __distanceToTarget = __afterTumblePosition.Distance(target.Position, true);
+                                if ((__distanceToTarget < Math.Pow(ObjectManager.Player.AttackRange + 65, 2) && __distanceToTarget > 110 * 110) || Cqspam)
+                                {
+                                    var range = tg.GetAutoAttackRange();
+                                    var path = CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), Prediction.Position.PredictUnitPosition(tg, (int)0.25), 300f, range);
+
+                                    if (path.Count() > 0)
+                                    {
+                                        var TumblePosition = path.MinOrDefault(x => x.Distance(Game.CursorPos)).To3D();
+                                        if (!TumblePosition.IsSafe(true))
+                                        {
+                                            CastQ(TumblePosition);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        DefaultQCast(__QPosition, tg);
+                                    }
+                                }
+                                break;
                             default:
                                 tumblePosition = Game.CursorPos;
                                 break;
                         }
                         if ((tumblePosition.Distance(myHero.Position) > 2000 || IsDangerousPosition(tumblePosition)))
                         {
-                            if (mode != 3)
+                            if (mode != 3 || mode != 6 || mode != 7 || mode != 8)
                             {
                                 return;
                             }
                         }
-                        if (mode != 3)
+                        if (mode != 3 || mode != 6 || mode != 7 || mode != 8)
                         {
                             myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
                         }
@@ -605,6 +664,178 @@ namespace Vayne
             if (UseQOnlyAt2WStacksBool && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && possible2WTarget.IsValidTarget())
             {
                 myHero.Spellbook.CastSpell(SpellSlot.Q, GetTumblePos(possible2WTarget));
+            }
+        }
+
+        public static T MinOrDefault<T, TR>(this IEnumerable<T> container, Func<T, TR> valuingFoo) where TR : IComparable
+        {
+            var enumerator = container.GetEnumerator();
+            if (!enumerator.MoveNext())
+            {
+                return default(T);
+            }
+
+            var minElem = enumerator.Current;
+            var minVal = valuingFoo(minElem);
+
+            while (enumerator.MoveNext())
+            {
+                var currVal = valuingFoo(enumerator.Current);
+
+                if (currVal.CompareTo(minVal) < 0)
+                {
+                    minVal = currVal;
+                    minElem = enumerator.Current;
+                }
+            }
+
+            return minElem;
+        }
+
+        public static Vector2[] CircleCircleIntersection(Vector2 center1, Vector2 center2, float radius1, float radius2)
+        {
+            var D = center1.Distance(center2);
+            //The Circles dont intersect:
+            if (D > radius1 + radius2 || (D <= Math.Abs(radius1 - radius2)))
+            {
+                return new Vector2[] { };
+            }
+
+            var A = (radius1 * radius1 - radius2 * radius2 + D * D) / (2 * D);
+            var H = (float)Math.Sqrt(radius1 * radius1 - A * A);
+            var Direction = (center2 - center1).Normalized();
+            var PA = center1 + A * Direction;
+            var S1 = PA + H * Direction.Perpendicular();
+            var S2 = PA - H * Direction.Perpendicular();
+            return new[] { S1, S2 };
+        }
+
+        public static float GetRealAutoAttackRange(AIHeroClient attacker, AttackableUnit target)
+        {
+            var result = attacker.AttackRange + attacker.BoundingRadius;
+            if (target.IsValidTarget())
+            {
+                return result + target.BoundingRadius;
+            }
+            return result;
+        }
+
+        private const float Range = 1200f;
+        public static IEnumerable<AIHeroClient> MeleeEnemiesTowardsMe
+        {
+            get
+            {
+                return EntityManager.Heroes.Enemies.FindAll(m => m.IsMelee && m.Distance(ObjectManager.Player) <= GetRealAutoAttackRange(m, ObjectManager.Player) && (m.ServerPosition.To2D() + (m.BoundingRadius + 25f) * m.Direction.To2D().Perpendicular()).Distance(ObjectManager.Player.ServerPosition.To2D()) <= m.ServerPosition.Distance(ObjectManager.Player.ServerPosition) && m.IsValidTarget(Range, false));
+            }
+        }
+        public static Vector3 GetSmartQPosition()
+        {
+            if (!Csmartq || !E.IsReady())
+            {
+                return Vector3.Zero;
+            }
+
+            const int currentStep = 30;
+            var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
+            for (var i = 0f; i < 360f; i += currentStep)
+            {
+                var angleRad = DegreeToRadian(i);
+                var rotatedPosition = (ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad))).To3D();
+                if (GetTarget(rotatedPosition).IsValidTarget() && rotatedPosition.IsSafe())
+                {
+                    return rotatedPosition;
+                }
+            }
+
+            return Vector3.Zero;
+        }
+
+        public static Vector3 GetAfterTumblePosition(Vector3 endPosition)
+        {
+            return ObjectManager.Player.ServerPosition.Extend(endPosition, 300f).To3D();
+        }
+
+        public static List<AIHeroClient> GetLhEnemiesNear(this Vector3 position, float range, float healthpercent)
+        {
+            return EntityManager.Heroes.Enemies.Where(hero => hero.IsValidTarget(range, true, position) && hero.HealthPercent <= healthpercent).ToList();
+        }
+        public static bool UnderAllyTurret_Ex(this Vector3 position)
+        {
+            return ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && !t.IsDead);
+        }
+
+        public static bool IsSafe(this Vector3 position, bool noQIntoEnemiesCheck = false)
+        {
+            if (position.UnderTurret(true) && !ObjectManager.Player.UnderTurret(true))
+            {
+                return false;
+            }
+
+            var allies = position.CountAlliesInRange(ObjectManager.Player.AttackRange);
+            var enemies = position.CountEnemiesInRange(ObjectManager.Player.AttackRange);
+            var lhEnemies = position.GetLhEnemiesNear(ObjectManager.Player.AttackRange, 15).Count();
+
+            if (enemies <= 1) ////It's a 1v1, safe to assume I can Q
+            {
+                return true;
+            }
+
+            if (position.UnderAllyTurret_Ex())
+            {
+                var nearestAllyTurret = ObjectManager.Get<Obj_AI_Turret>().Where(a => a.IsAlly).OrderBy(d => d.Distance(position, true)).FirstOrDefault();
+
+                if (nearestAllyTurret != null)
+                {
+                    allies += 2;
+                }
+            }
+
+            var normalCheck = (allies + 1 > enemies - lhEnemies);
+            var QEnemiesCheck = true;
+
+            if (Cnoqenemies && noQIntoEnemiesCheck)
+            {
+                if (!Cnoqenemiesold)
+                {
+                    var Vector2Position = position.To2D();
+                    var enemyPoints = Cdynamicqsafety ? GetEnemyPoints() : GetEnemyPoints(false);
+                    if (enemyPoints.Contains(Vector2Position) && !Cqspam)
+                    {
+                        QEnemiesCheck = false;
+                    }
+
+                    var closeEnemies = EntityManager.Heroes.Enemies.FindAll(en => en.IsValidTarget(1500f) && !(en.Distance(ObjectManager.Player.ServerPosition) < en.AttackRange + 65f)).OrderBy(en => en.Distance(position));
+
+                    if (!closeEnemies.All(enemy => position.CountEnemiesInRange(Cdynamicqsafety ? enemy.AttackRange : 405f) <= 1))
+                    {
+                        QEnemiesCheck = false;
+                    }
+                }
+                else
+                {
+                    var closeEnemies = EntityManager.Heroes.Enemies.FindAll(en => en.IsValidTarget(1500f)).OrderBy(en => en.Distance(position));
+                    if (closeEnemies.Any())
+                    {
+                        QEnemiesCheck = !closeEnemies.All(enemy => position.CountEnemiesInRange(Cdynamicqsafety ? enemy.AttackRange : 405f) <= 1);
+                    }
+                }
+
+            }
+
+            return normalCheck && QEnemiesCheck;
+        }
+
+        private static void DefaultQCast(Vector3 position, AIHeroClient Target)
+        {
+            var afterTumblePosition = GetAfterTumblePosition(Game.CursorPos);
+            var CursorPos = Game.CursorPos;
+            var EnemyPoints = GetEnemyPoints();
+            if (afterTumblePosition.IsSafe(true) || (!EnemyPoints.Contains(Game.CursorPos.To2D())) || (EnemiesClose.Count() == 1))
+            {
+                if (afterTumblePosition.Distance(Target.ServerPosition) <= Target.GetAutoAttackRange())
+                {
+                    CastQ(position);
+                }
             }
         }
 
@@ -1149,6 +1380,12 @@ namespace Vayne
         public static bool useCutlass { get { return ItemMenu["useCutlass"].Cast<CheckBox>().CurrentValue; } }
         public static bool useGhostBlade { get { return ItemMenu["useGhostBlade"].Cast<CheckBox>().CurrentValue; } }
         public static bool smartq { get { return QSettings["smartq"].Cast<CheckBox>().CurrentValue; } }
+
+        public static bool Cdynamicqsafety { get { return QSettings["Cdynamicqsafety"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Csmartq { get { return QSettings["Csmartq"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Cnoqenemies { get { return QSettings["Cnoqenemies"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Cnoqenemiesold { get { return QSettings["Cnoqenemiesold"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Cqspam { get { return QSettings["Cqspam"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
@@ -1179,9 +1416,10 @@ namespace Vayne
             QSettings.AddGroupLabel("Q Settings");
             QSettings.AddSeparator();
             QSettings.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR/SOLO | 4 : Sharpshooter | 5 : SAC");
-            QSettings.Add("qmode", new Slider("Q Mode:", 5, 1, 5)); // QModeStringList
+            QSettings.AddLabel("6 : Cursor | 7 : Kite Melee | 8 : Kurisu");
+            QSettings.Add("qmode", new Slider("Q Mode:", 5, 1, 8)); // QModeStringList
             QSettings.AddSeparator();
-            QSettings.AddGroupLabel("VHR Q Settings");
+            QSettings.AddGroupLabel("VHR/SOLOVayne Q Settings");
             QSettings.AddLabel("YOU HAVE TO HAVE OPTION 3 SELECTED TO USE THIS");
             QSettings.Add("noqenemies", new CheckBox("Don't Q into enemies", true)); // noqenemies
             QSettings.Add("smartq", new CheckBox("Try to QE when possible", true)); // noqenemiesold
@@ -1199,6 +1437,14 @@ namespace Vayne
             QSettings.Add("DontQIntoEnemies", new CheckBox("Dont Q Into Enemies", true)); // DontQIntoEnemies
             QSettings.Add("Wall", new CheckBox("Always Tumble to wall if possible", true)); // Wall
             QSettings.Add("Only2W", new CheckBox("Tumble only when enemy has 2 w stacks", false)); // Only2W
+            QSettings.AddSeparator();
+            QSettings.AddGroupLabel("Cursor/Kite Melee/Kurisu Q Settings");
+            QSettings.AddLabel("YOU HAVE TO HAVE OPTION 6, 7 OR 8 SELECTED TO USE THIS");
+            QSettings.Add("Cdynamicqsafety", new CheckBox("Use Dynamic Q Safety", true));
+            QSettings.Add("Csmartq", new CheckBox("Use Smart Q", true));
+            QSettings.Add("Cnoqenemies", new CheckBox("Don't Q into enemies", true));
+            QSettings.Add("Cnoqenemiesold", new CheckBox("Don't Q into enemies Old", true));
+            QSettings.Add("Cqspam", new CheckBox("Ignore Checks AKA Spam Q", true));
             QSettings.AddSeparator();
 
             CondemnSettings = Menu.AddSubMenu("Condemn Settings", "condemnsettings");
@@ -1225,7 +1471,6 @@ namespace Vayne
 
             ESettings = Menu.AddSubMenu("E Settings", "esettings");
             ESettings.AddGroupLabel("SAC Condemn Settings");
-            ESettings.AddSeparator();
             ESettings.AddLabel("YOU HAVE TO HAVE OPTION 10 SELECTED TO USE THIS");
             ESettings.Add("Accuracy", new Slider("Accuracy", 12, 2, 12)); // Accuracy
             ESettings.Add("TumbleCondemnCount", new Slider("Q->E Position Check Count", 12, 2, 12)); // TumbleCondemnCount
@@ -1235,12 +1480,11 @@ namespace Vayne
             ESettings.Add("DontCondemnTurret", new CheckBox("Don't Condemn under turret?", true)); // TumbleCondemnSafe
             ESettings.AddSeparator();
             ESettings.AddGroupLabel("OKTW Condemn Settings");
-            ESettings.AddSeparator();
             ESettings.AddLabel("YOU HAVE TO HAVE OPTION 11 SELECTED TO USE THIS");
             foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
             {
                 ESettings.Add("stun" + enemy.ChampionName, new CheckBox("Condemn : " + enemy.ChampionName + "?"));
-            } 
+            }
             ESettings.AddSeparator();
 
             FarmSettings = Menu.AddSubMenu("Farm Settings", "farm");
