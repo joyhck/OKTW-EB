@@ -114,7 +114,7 @@ namespace KogMaw
             Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1650, 70);
             W = new Spell.Active(SpellSlot.W, (uint)myHero.GetAutoAttackRange());
             E = new Spell.Skillshot(SpellSlot.E, 650, SkillShotType.Linear, 500, 1400, 120);
-            R = new Spell.Skillshot(SpellSlot.R, 1260, SkillShotType.Circular, 1500, int.MaxValue, 225);
+            R = new Spell.Skillshot(SpellSlot.R, 1800, SkillShotType.Circular, 1200, int.MaxValue, 120);
 
             Drawing.OnDraw += OnDraw;
             Game.OnTick += OnTick;
