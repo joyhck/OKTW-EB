@@ -77,12 +77,12 @@ namespace Vayne
         {
             var target = TargetSelector.GetTarget(550, DamageType.Physical);
 
-            if (target == null) {
-                return;
-            }
+            if (target == null) { return; }
 
             if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade) && !cleanse.IsReady())
+            {
                 return;
+            }
 
             if (myHero.HealthPercent >= (float)cleanHP || !_Clean)
                 return;
@@ -135,12 +135,13 @@ namespace Vayne
 
         public static void OnUpdate(EventArgs args)
         {
-            Cleansers();
+
+            //Cleansers();
 
             if (Item.CanUseItem(ItemId.Blade_of_the_Ruined_King) && useBotrk)
             {
                 var t = TargetSelector.GetTarget(550, DamageType.Physical);
-                if (t.IsValidTarget())
+                if (t.IsValidTarget() && t != null)
                 {
                     if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     {
@@ -152,7 +153,7 @@ namespace Vayne
             if (Item.CanUseItem(ItemId.Bilgewater_Cutlass) && useCutlass)
             {
                 var t = TargetSelector.GetTarget(550, DamageType.Magical);
-                if (t.IsValidTarget())
+                if (t.IsValidTarget() && t != null)
                 {
                     if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     {
@@ -165,7 +166,7 @@ namespace Vayne
             {
                 var t = TargetSelector.GetTarget(750, DamageType.Magical);
 
-                if (t.IsValidTarget() && t is AIHeroClient)
+                if (t.IsValidTarget() && t is AIHeroClient && t != null)
                 {
                     if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     {
