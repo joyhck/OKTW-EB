@@ -75,6 +75,12 @@ namespace Vayne
 
         private static void Cleansers()
         {
+            var target = TargetSelector.GetTarget(550, DamageType.Physical);
+
+            if (target == null) {
+                return;
+            }
+
             if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade) && !cleanse.IsReady())
                 return;
 
