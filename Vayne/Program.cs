@@ -1163,17 +1163,16 @@ namespace Vayne
 
             ComboMenu = Menu.AddSubMenu("Combo Settings", "combo");
             ComboMenu.AddGroupLabel("Combo");
-            ComboMenu.AddSeparator();
             ComboMenu.Add("useq", new CheckBox("Use Q")); // UseQBool
-            ComboMenu.AddSeparator();
-            ComboMenu.AddLabel("1 : Never | 2 : E-Not-Ready | 3 : Always");
-            ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
             ComboMenu.AddSeparator();
             ComboMenu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
             ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
             ComboMenu.AddSeparator();
             ComboMenu.Add("user", new KeyBind("Use R In Combo", false, KeyBind.BindTypes.PressToggle, 'A')); // UseRBool
             ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
+            ComboMenu.AddSeparator();
+            ComboMenu.AddLabel("1 : Never | 2 : E-Not-Ready | 3 : Always");
+            ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
             ComboMenu.AddSeparator();
 
             QSettings = Menu.AddSubMenu("Q Settings", "qsettings");
@@ -1211,19 +1210,18 @@ namespace Vayne
             CondemnSettings.AddLabel("1 : Prada Smart | 2 : Prada Perfect | 3 : Marksman");
             CondemnSettings.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
             CondemnSettings.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
-            CondemnSettings.AddLabel("10 : Synx Auto Carry");
-            CondemnSettings.Add("emode", new Slider("E Mode: ", 10, 1, 10)); // EModeStringList
+            CondemnSettings.AddLabel("10 : Synx Auto Carry | 11 : OKTW");
+            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 11)); // EModeStringList
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
             CondemnSettings.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("epushdist", new Slider("E Push Distance: ", 425, 300, 475)); // EPushDistanceSlider
             CondemnSettings.AddSeparator();
-            CondemnSettings.Add("ehitchance", new Slider("Condemn Hitchance", 50, 0, 100)); // EHitchanceSlider
+            CondemnSettings.Add("ehitchance", new Slider("Condemn Hitchance", 75, 0, 100)); // EHitchanceSlider
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.PressToggle, 'E')); // SemiAutomaticCondemnKey
             CondemnSettings.AddSeparator();
-
 
             ESettings = Menu.AddSubMenu("E Settings", "esettings");
             ESettings.AddGroupLabel("SAC Condemn Settings");
@@ -1235,6 +1233,14 @@ namespace Vayne
             ESettings.AddSeparator();
             ESettings.Add("TumbleCondemnSafe", new CheckBox("Only Q->E when tumble position is safe", false)); // TumbleCondemnSafe
             ESettings.Add("DontCondemnTurret", new CheckBox("Don't Condemn under turret?", true)); // TumbleCondemnSafe
+            ESettings.AddSeparator();
+            ESettings.AddGroupLabel("OKTW Condemn Settings");
+            ESettings.AddSeparator();
+            ESettings.AddLabel("YOU HAVE TO HAVE OPTION 11 SELECTED TO USE THIS");
+            foreach (var enemy in ObjectManager.Get<AIHeroClient>().Where(enemy => enemy.IsEnemy))
+            {
+                ESettings.Add("stun" + enemy.ChampionName, new CheckBox("Condemn : " + enemy.ChampionName + "?"));
+            } 
             ESettings.AddSeparator();
 
             FarmSettings = Menu.AddSubMenu("Farm Settings", "farm");
@@ -1466,6 +1472,14 @@ namespace Vayne
                 }
             }
 
+            if (mode == 11)
+            {
+                if (CondemnCheck(myHero.ServerPosition, hero) && ESettings["stun" + hero.ChampionName].Cast<CheckBox>().CurrentValue)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -1692,6 +1706,44 @@ namespace Vayne
             }
 
             return result;
+        }
+
+        private static bool CondemnCheck(Vector3 fromPosition, AIHeroClient target) // OKTW Vayne E Logic
+        {
+            var prepos = E2.GetPrediction(target);
+
+            float pushDistance = 460;
+
+            if (myHero.ServerPosition != fromPosition)
+                pushDistance = 410;
+
+            int radius = 220;
+            var start2 = target.ServerPosition;
+            var end2 = prepos.CastPosition.Extend(fromPosition, -pushDistance);
+
+            Vector2 start = start2.To2D();
+            Vector2 end = end2;
+            var dir = (end - start).Normalized();
+            var pDir = dir.Perpendicular();
+
+            var rightEndPos = end + pDir * radius;
+            var leftEndPos = end - pDir * radius;
+
+
+            var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z);
+            var lEndPos = new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z);
+
+
+            var step = start2.Distance(rEndPos) / 10;
+            for (var i = 0; i < 10; i++)
+            {
+                var pr = start2.Extend(rEndPos, step * i);
+                var pl = start2.Extend(lEndPos, step * i);
+                if (pr.IsWall() && pl.IsWall())
+                    return true;
+            }
+
+            return false;
         }
 
         public static float GetPathLength(this List<Vector2> path)
