@@ -160,6 +160,17 @@ namespace Vayne
 
         public static void OnUpdate(EventArgs args)
         {
+            if (lowlifepeel && E.IsReady() && !Q.IsReady() && (ObjectManager.Player.HealthPercent <= 25))
+            {
+                var meleeEnemies = EntityManager.Heroes.Enemies.Where(m => m.Distance(ObjectManager.Player, true) <= 400 && m.IsMelee);
+
+                if (meleeEnemies.Any())
+                {
+                    var mostDangerous = meleeEnemies.OrderByDescending(m => m.GetAutoAttackDamage(ObjectManager.Player)).First();
+                    E.Cast(mostDangerous);
+                }
+            }
+
             if (_Clean)
             {
                 Cleansers();
@@ -1489,6 +1500,7 @@ namespace Vayne
         public static bool drawCurrentLogic { get { return DrawingMenu["drawCurrentLogic"].Cast<CheckBox>().CurrentValue; } }
         public static bool dontaa { get { return ComboMenu["dontaa"].Cast<KeyBind>().CurrentValue; } }
         public static bool onlyCondemnTarget { get { return CondemnSettings["onlyCondemnTarget"].Cast<CheckBox>().CurrentValue; } }
+        public static bool lowlifepeel { get { return ComboMenu["lowlifepeel"].Cast<CheckBox>().CurrentValue; } }
 
         #endregion
 
@@ -1507,6 +1519,7 @@ namespace Vayne
             ComboMenu.Add("useq", new CheckBox("Use Q")); // UseQBool
             ComboMenu.AddSeparator();
             ComboMenu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
+            ComboMenu.Add("lowlifepeel", new CheckBox("Peel w/ E when Low HP", false)); // lowlifepeel
             ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
             ComboMenu.AddSeparator();
             ComboMenu.Add("user", new KeyBind("Use R In Combo", false, KeyBind.BindTypes.PressToggle, 'A')); // UseRBool
