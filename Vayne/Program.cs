@@ -747,46 +747,46 @@ namespace Vayne
         #endregion
 
         #region Menu Items
-        public static bool UseQBool { get { return Menu["useq"].Cast<CheckBox>().CurrentValue; } }
-        public static int QModeStringList { get { return Menu["qmode"].Cast<Slider>().CurrentValue; } }
-        public static int UseQAntiGapcloserStringList { get { return Menu["qantigc"].Cast<Slider>().CurrentValue; } }
-        public static bool TryToFocus2WBool { get { return Menu["focus2w"].Cast<CheckBox>().CurrentValue; } }
-        public static bool DontAttackWhileInvisibleAndMeelesNearBool { get { return Menu["dontattackwhileinvisible"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseRBool { get { return Menu["user"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseEBool { get { return Menu["usee"].Cast<CheckBox>().CurrentValue; } }
-        public static int EModeStringList { get { return Menu["emode"].Cast<Slider>().CurrentValue; } }
-        public static bool UseEInterruptBool { get { return Menu["useeinterrupt"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseEAntiGapcloserBool { get { return Menu["useeantigapcloser"].Cast<CheckBox>().CurrentValue; } }
-        public static int EPushDistanceSlider { get { return Menu["epushdist"].Cast<Slider>().CurrentValue; } }
-        public static int EHitchanceSlider { get { return Menu["ehitchance"].Cast<Slider>().CurrentValue; } }
-        public static bool SemiAutomaticCondemnKey { get { return Menu["semiautoekey"].Cast<KeyBind>().CurrentValue; } }
-        public static bool UseEAs3rdWProcBool { get { return Menu["usee3rdwproc"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseQBonusOnEnemiesNotCS { get { return Menu["useqonenemiesnotcs"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseQOnlyAt2WStacksBool { get { return Menu["useqonlyon2stackedenemies"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseQFarm { get { return Menu["useqfarm"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseEJungleFarm { get { return Menu["useejgfarm"].Cast<CheckBox>().CurrentValue; } }
-        public static bool DrawWStacksBool { get { return Menu["drawwstacks"].Cast<CheckBox>().CurrentValue; } }
-        public static int GetAutoR { get { return Menu["GetAutoR"].Cast<Slider>().CurrentValue; } }
-        public static bool dynamicqsafety { get { return Menu["dynamicqsafety"].Cast<CheckBox>().CurrentValue; } }
-        public static bool qspam { get { return Menu["qspam"].Cast<CheckBox>().CurrentValue; } }
-        public static bool noqenemies { get { return Menu["noqenemies"].Cast<CheckBox>().CurrentValue; } }
-        public static bool noqenemiesold { get { return Menu["noqenemiesold"].Cast<CheckBox>().CurrentValue; } }
-        public static bool antiMelee { get { return Menu["antiMelee"].Cast<CheckBox>().CurrentValue; } }
-        public static int Accuracy { get { return Menu["Accuracy"].Cast<Slider>().CurrentValue; } }
-        public static int TumbleCondemnCount { get { return Menu["TumbleCondemnCount"].Cast<Slider>().CurrentValue; } }
-        public static int sacMode { get { return Menu["sacMode"].Cast<Slider>().CurrentValue; } }
-        public static bool TumbleCondemn { get { return Menu["TumbleCondemn"].Cast<CheckBox>().CurrentValue; } }
-        public static bool TumbleCondemnSafe { get { return Menu["TumbleCondemnSafe"].Cast<CheckBox>().CurrentValue; } }
-        public static bool DontCondemnTurret { get { return Menu["DontCondemnTurret"].Cast<CheckBox>().CurrentValue; } }
-        public static bool DontSafeCheck { get { return Menu["DontSafeCheck"].Cast<CheckBox>().CurrentValue; } }
-        public static bool DontQIntoEnemies { get { return Menu["DontQIntoEnemies"].Cast<CheckBox>().CurrentValue; } }
-        public static bool Wall { get { return Menu["Wall"].Cast<CheckBox>().CurrentValue; } }
-        public static bool Only2W { get { return Menu["Only2W"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseQBool { get { return ComboMenu["useq"].Cast<CheckBox>().CurrentValue; } }
+        public static int QModeStringList { get { return QSettings["qmode"].Cast<Slider>().CurrentValue; } }
+        public static int UseQAntiGapcloserStringList { get { return ComboMenu["qantigc"].Cast<Slider>().CurrentValue; } }
+        public static bool TryToFocus2WBool { get { return ComboMenu["focus2w"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontAttackWhileInvisibleAndMeelesNearBool { get { return ComboMenu["dontattackwhileinvisible"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseRBool { get { return ComboMenu["user"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseEBool { get { return CondemnSettings["usee"].Cast<CheckBox>().CurrentValue; } }
+        public static int EModeStringList { get { return CondemnSettings["emode"].Cast<Slider>().CurrentValue; } }
+        public static bool UseEInterruptBool { get { return CondemnSettings["useeinterrupt"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseEAntiGapcloserBool { get { return CondemnSettings["useeantigapcloser"].Cast<CheckBox>().CurrentValue; } }
+        public static int EPushDistanceSlider { get { return CondemnSettings["epushdist"].Cast<Slider>().CurrentValue; } }
+        public static int EHitchanceSlider { get { return CondemnSettings["ehitchance"].Cast<Slider>().CurrentValue; } }
+        public static bool SemiAutomaticCondemnKey { get { return CondemnSettings["semiautoekey"].Cast<KeyBind>().CurrentValue; } }
+        public static bool UseEAs3rdWProcBool { get { return ExtraMenu["usee3rdwproc"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseQBonusOnEnemiesNotCS { get { return ExtraMenu["useqonenemiesnotcs"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseQOnlyAt2WStacksBool { get { return ExtraMenu["useqonlyon2stackedenemies"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseQFarm { get { return FarmSettings["useqfarm"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseEJungleFarm { get { return FarmSettings["useejgfarm"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DrawWStacksBool { get { return DrawingMenu["drawwstacks"].Cast<CheckBox>().CurrentValue; } }
+        public static int GetAutoR { get { return ComboMenu["GetAutoR"].Cast<Slider>().CurrentValue; } }
+        public static bool dynamicqsafety { get { return QSettings["dynamicqsafety"].Cast<CheckBox>().CurrentValue; } }
+        public static bool qspam { get { return QSettings["qspam"].Cast<CheckBox>().CurrentValue; } }
+        public static bool noqenemies { get { return QSettings["noqenemies"].Cast<CheckBox>().CurrentValue; } }
+        public static bool noqenemiesold { get { return QSettings["noqenemiesold"].Cast<CheckBox>().CurrentValue; } }
+        public static bool antiMelee { get { return QSettings["antiMelee"].Cast<CheckBox>().CurrentValue; } }
+        public static int Accuracy { get { return ESettings["Accuracy"].Cast<Slider>().CurrentValue; } }
+        public static int TumbleCondemnCount { get { return ESettings["TumbleCondemnCount"].Cast<Slider>().CurrentValue; } }
+        public static int sacMode { get { return QSettings["sacMode"].Cast<Slider>().CurrentValue; } }
+        public static bool TumbleCondemn { get { return ESettings["TumbleCondemn"].Cast<CheckBox>().CurrentValue; } }
+        public static bool TumbleCondemnSafe { get { return ESettings["TumbleCondemnSafe"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontCondemnTurret { get { return ESettings["DontCondemnTurret"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontSafeCheck { get { return QSettings["DontSafeCheck"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontQIntoEnemies { get { return QSettings["DontQIntoEnemies"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Wall { get { return QSettings["Wall"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Only2W { get { return QSettings["Only2W"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
 
-        private static EloBuddy.SDK.Menu.Menu Menu;
+        private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu;
 
         private static void InitMenu()
         {
@@ -794,87 +794,102 @@ namespace Vayne
             Menu.AddLabel("Base Ported from Challenger Series & features ported from many other assemblies on L# - Berb");
             Menu.AddSeparator();
 
-            Menu.AddGroupLabel("Combo");
-            Menu.Add("useq", new CheckBox("Use Q")); // UseQBool
-            Menu.AddSeparator();
-            Menu.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR | 4 : Sharpshooter | 5 : SAC");
-            Menu.Add("qmode", new Slider("Q Mode:", 3, 1, 5)); // QModeStringList
-            Menu.AddSeparator();
-            Menu.AddLabel("1 : Never | 2 : E-Not-Ready | 3 : Always");
-            Menu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
-            Menu.AddSeparator();
-            Menu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
-            Menu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
-            Menu.AddSeparator();
-            Menu.Add("user", new CheckBox("Use R In Combo", false)); // UseRBool
-            Menu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
-            Menu.AddSeparator();
+            ComboMenu = Menu.AddSubMenu("Combo Settings", "combo");
+            ComboMenu.AddGroupLabel("Combo");
+            ComboMenu.AddSeparator();
+            ComboMenu.Add("useq", new CheckBox("Use Q")); // UseQBool
+            ComboMenu.AddSeparator();
+            ComboMenu.AddLabel("1 : Never | 2 : E-Not-Ready | 3 : Always");
+            ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
+            ComboMenu.AddSeparator();
+            ComboMenu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
+            ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
+            ComboMenu.AddSeparator();
+            ComboMenu.Add("user", new CheckBox("Use R In Combo", false)); // UseRBool
+            ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
+            ComboMenu.AddSeparator();
 
-            Menu.AddGroupLabel("VHR Q Settings");
-            Menu.AddLabel("YOU HAVE TO HAVE OPTION 3 SELECTED TO USE THIS");
-            Menu.Add("dynamicqsafety", new CheckBox("Use dynamic Q Safety Distance", true)); // dynamicqsafety
-            Menu.Add("qspam", new CheckBox("Ignore Q checks", true)); // qspam
-            Menu.Add("noqenemies", new CheckBox("Don't Q into enemies", true)); // noqenemies
-            Menu.Add("noqenemiesold", new CheckBox("Use Old Don't Q into enemies", true)); // noqenemiesold
-            Menu.AddSeparator();
+            QSettings = Menu.AddSubMenu("Q Settings", "qsettings");
+            QSettings.AddGroupLabel("Q Settings");
+            QSettings.AddSeparator();
+            QSettings.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR | 4 : Sharpshooter | 5 : SAC");
+            QSettings.Add("qmode", new Slider("Q Mode:", 3, 1, 5)); // QModeStringList
+            QSettings.AddSeparator();
+            QSettings.AddGroupLabel("VHR Q Settings");
+            QSettings.AddLabel("YOU HAVE TO HAVE OPTION 3 SELECTED TO USE THIS");
+            QSettings.Add("dynamicqsafety", new CheckBox("Use dynamic Q Safety Distance", true)); // dynamicqsafety
+            QSettings.Add("qspam", new CheckBox("Ignore Q checks", true)); // qspam
+            QSettings.Add("noqenemies", new CheckBox("Don't Q into enemies", true)); // noqenemies
+            QSettings.Add("noqenemiesold", new CheckBox("Use Old Don't Q into enemies", true)); // noqenemiesold
+            QSettings.AddSeparator();
+            QSettings.AddGroupLabel("Sharpshooter Q Settings");
+            QSettings.AddLabel("YOU HAVE TO HAVE OPTION 4 SELECTED TO USE THIS");
+            QSettings.Add("antiMelee", new CheckBox("Use Anti-Melee (Q)", true)); // antiMelee
+            QSettings.AddSeparator();
+            QSettings.AddGroupLabel("Synx Auto Carry Q Settings");
+            QSettings.AddLabel("YOU HAVE TO HAVE OPTION 5 SELECTED TO USE THIS");
+            QSettings.AddLabel("1 : Auto Position | 2 : Mouse Cursor");
+            QSettings.Add("sacMode", new Slider("Q Mode: ", 1, 1, 2)); // sacMode
+            QSettings.Add("DontSafeCheck", new CheckBox("Dont check tumble position is safe", true)); // DontSafeCheck
+            QSettings.Add("DontQIntoEnemies", new CheckBox("Dont Q Into Enemies", true)); // DontQIntoEnemies
+            QSettings.Add("Wall", new CheckBox("Always Tumble to wall if possible", true)); // Wall
+            QSettings.Add("Only2W", new CheckBox("Tumble only when enemy has 2 w stacks", false)); // Only2W
+            QSettings.AddSeparator();
 
-            Menu.AddGroupLabel("Sharpshooter Q Settings");
-            Menu.AddLabel("YOU HAVE TO HAVE OPTION 4 SELECTED TO USE THIS");
-            Menu.Add("antiMelee", new CheckBox("Use Anti-Melee (Q)", true)); // antiMelee
-            Menu.AddSeparator();
+            CondemnSettings = Menu.AddSubMenu("Condemn Settings", "condemnsettings");
+            CondemnSettings.AddGroupLabel("Condemn Menu");
+            CondemnSettings.AddSeparator();
+            CondemnSettings.Add("usee", new CheckBox("Auto E")); // UseEBool
+            CondemnSettings.AddSeparator();
+            CondemnSettings.AddLabel("1 : Prada Smart | 2 : Prada Perfect | 3 : Marksman");
+            CondemnSettings.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
+            CondemnSettings.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
+            CondemnSettings.AddLabel("10 : Synx Auto Carry");
+            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 10)); // EModeStringList
+            CondemnSettings.AddSeparator();
+            CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
+            CondemnSettings.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
+            CondemnSettings.AddSeparator();
+            CondemnSettings.Add("epushdist", new Slider("E Push Distance: ", 425, 300, 475)); // EPushDistanceSlider
+            CondemnSettings.AddSeparator();
+            CondemnSettings.Add("ehitchance", new Slider("Condemn Hitchance", 50, 0, 100)); // EHitchanceSlider
+            CondemnSettings.AddSeparator();
+            CondemnSettings.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.PressToggle, 'E')); // SemiAutomaticCondemnKey
+            CondemnSettings.AddSeparator();
 
-            Menu.AddGroupLabel("Synx Auto Carry Q Settings");
-            Menu.AddLabel("YOU HAVE TO HAVE OPTION 5 SELECTED TO USE THIS");
-            Menu.AddLabel("1 : Auto Position | 2 : Mouse Cursor");
-            Menu.Add("sacMode", new Slider("Q Mode: ", 1, 1, 2)); // sacMode
-            Menu.Add("DontSafeCheck", new CheckBox("Dont check tumble position is safe", true)); // DontSafeCheck
-            Menu.Add("DontQIntoEnemies", new CheckBox("Dont Q Into Enemies", true)); // DontQIntoEnemies
-            Menu.Add("Wall", new CheckBox("Always Tumble to wall if possible", true)); // Wall
-            Menu.Add("Only2W", new CheckBox("Tumble only when enemy has 2 w stacks", false)); // Only2W
-            Menu.AddSeparator();
 
-            Menu.AddGroupLabel("Condemn Menu");
-            Menu.Add("usee", new CheckBox("Auto E")); // UseEBool
-            Menu.AddSeparator();
-            Menu.AddLabel("1 : Prada Smart | 2 : Prada Perfect | 3 : Marksman");
-            Menu.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
-            Menu.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
-            Menu.AddLabel("10 : Synx Auto Carry");
-            Menu.Add("emode", new Slider("E Mode: ", 2, 1, 10)); // EModeStringList
-            Menu.AddSeparator();
-            Menu.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
-            Menu.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
-            Menu.AddSeparator();
-            Menu.Add("epushdist", new Slider("E Push Distance: ", 425, 300, 475)); // EPushDistanceSlider
-            Menu.AddSeparator();
-            Menu.Add("ehitchance", new Slider("Condemn Hitchance", 50, 0, 100)); // EHitchanceSlider
-            Menu.AddSeparator();
-            Menu.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.PressToggle, 'E')); // SemiAutomaticCondemnKey
-            Menu.AddSeparator();
+            ESettings = Menu.AddSubMenu("E Settings", "esettings");
+            ESettings.AddGroupLabel("SAC Condemn Settings");
+            ESettings.AddSeparator();
+            ESettings.AddLabel("YOU HAVE TO HAVE OPTION 10 SELECTED TO USE THIS");
+            ESettings.Add("Accuracy", new Slider("Accuracy", 12, 2, 12)); // Accuracy
+            ESettings.Add("TumbleCondemnCount", new Slider("Q->E Position Check Count", 12, 2, 12)); // TumbleCondemnCount
+            ESettings.Add("TumbleCondemn", new CheckBox("Q->E when possible")); // TumbleCondemn
+            ESettings.AddSeparator();
+            ESettings.Add("TumbleCondemnSafe", new CheckBox("Only Q->E when tumble position is safe", false)); // TumbleCondemnSafe
+            ESettings.Add("DontCondemnTurret", new CheckBox("Don't Condemn under turret?", true)); // TumbleCondemnSafe
+            ESettings.AddSeparator();
 
-            Menu.AddGroupLabel("SAC Condemn Settings");
-            Menu.AddLabel("YOU HAVE TO HAVE OPTION 10 SELECTED TO USE THIS");
-            Menu.Add("Accuracy", new Slider("Accuracy", 12, 2, 12)); // Accuracy
-            Menu.Add("TumbleCondemn", new CheckBox("Q->E when possible")); // TumbleCondemn
-            Menu.Add("TumbleCondemnCount", new Slider("Q->E Position Check Count", 12, 2, 12)); // TumbleCondemnCount
-            Menu.Add("TumbleCondemnSafe", new CheckBox("Only Q->E when tumble position is safe", false)); // TumbleCondemnSafe
-            Menu.Add("DontCondemnTurret", new CheckBox("Don't Condemn under turret?", true)); // TumbleCondemnSafe
-            Menu.AddSeparator();
+            FarmSettings = Menu.AddSubMenu("Farm Settings", "farm");
+            FarmSettings.AddGroupLabel("Farm Menu");
+            FarmSettings.AddSeparator();
+            FarmSettings.Add("useqfarm", new CheckBox("Use Q Farm/Jungle")); // UseQFarm
+            FarmSettings.Add("useejgfarm", new CheckBox("Use E Jungle")); // UseEJungleFarm
+            FarmSettings.AddSeparator();
 
-            Menu.AddGroupLabel("Farm Menu");
-            Menu.Add("useqfarm", new CheckBox("Use Q Farm/Jungle")); // UseQFarm
-            Menu.Add("useejgfarm", new CheckBox("Use E Jungle")); // UseEJungleFarm
-            Menu.AddSeparator();
+            ExtraMenu = Menu.AddSubMenu("Extra Settings", "extra");
+            ExtraMenu.AddGroupLabel("Extra Settings");
+            ExtraMenu.AddSeparator();
+            ExtraMenu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc Before LVL: ", false)); // UseEAs3rdWProcBool
+            ExtraMenu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
+            ExtraMenu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
+            ExtraMenu.AddSeparator();
 
-            Menu.AddGroupLabel("Extra Settings");
-            Menu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc Before LVL: ", false)); // UseEAs3rdWProcBool
-            Menu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
-            Menu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
-            Menu.AddSeparator();
-
-            Menu.AddGroupLabel("Drawing Menu");
-            Menu.Add("drawwstacks", new CheckBox("Draw W Stacks")); // DrawWStacksBool
-            Menu.AddSeparator();
+            DrawingMenu = Menu.AddSubMenu("Draw Settings", "draw");
+            DrawingMenu.AddGroupLabel("Drawing Menu");
+            DrawingMenu.AddSeparator();
+            DrawingMenu.Add("drawwstacks", new CheckBox("Draw W Stacks")); // DrawWStacksBool
+            DrawingMenu.AddSeparator();
         }
 
         #endregion Menu
