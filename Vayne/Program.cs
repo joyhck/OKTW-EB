@@ -1488,6 +1488,7 @@ namespace Vayne
         public static bool Cqspam { get { return QSettings["Cqspam"].Cast<CheckBox>().CurrentValue; } }
         public static bool drawCurrentLogic { get { return DrawingMenu["drawCurrentLogic"].Cast<CheckBox>().CurrentValue; } }
         public static bool dontaa { get { return ComboMenu["dontaa"].Cast<KeyBind>().CurrentValue; } }
+        public static bool onlyCondemnTarget { get { return CondemnSettings["onlyCondemnTarget"].Cast<KeyBind>().CurrentValue; } }
 
         #endregion
 
@@ -1564,6 +1565,7 @@ namespace Vayne
             CondemnSettings.AddLabel("10 : Synx Auto Carry | 11 : OKTW");
             CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 11)); // EModeStringList
             CondemnSettings.AddSeparator();
+            CondemnSettings.Add("onlyCondemnTarget", new CheckBox("Only Condemn Current Target", false)); // UseEInterruptBool
             CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
             CondemnSettings.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
             CondemnSettings.AddSeparator();
@@ -1648,7 +1650,20 @@ namespace Vayne
 
         public static bool IsCondemnable(AIHeroClient hero)
         {
-            if (!hero.IsValidTarget(550f) || hero.HasBuffOfType(BuffType.SpellShield) || hero.HasBuffOfType(BuffType.SpellImmunity) || hero.IsDashing()) return false;
+            var target = TargetSelector.GetTarget(550, DamageType.Physical);
+
+            if (onlyCondemnTarget)
+            {
+                if (target.NetworkId != hero.NetworkId)
+                {
+                    return false;
+                }
+            }
+
+            if (!hero.IsValidTarget(550f) || hero.HasBuffOfType(BuffType.SpellShield) || hero.HasBuffOfType(BuffType.SpellImmunity) || hero.IsDashing())
+            {
+                return false;
+            }
 
             var pP = myHero.ServerPosition;
             var p = hero.ServerPosition;
