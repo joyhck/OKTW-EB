@@ -976,7 +976,7 @@ namespace Vayne
         public static int UseQAntiGapcloserStringList { get { return ComboMenu["qantigc"].Cast<Slider>().CurrentValue; } }
         public static bool TryToFocus2WBool { get { return ComboMenu["focus2w"].Cast<CheckBox>().CurrentValue; } }
         public static bool DontAttackWhileInvisibleAndMeelesNearBool { get { return ComboMenu["dontattackwhileinvisible"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseRBool { get { return ComboMenu["user"].Cast<CheckBox>().CurrentValue; } }
+        public static bool UseRBool { get { return ComboMenu["user"].Cast<KeyBind>().CurrentValue; } }
         public static bool UseEBool { get { return CondemnSettings["usee"].Cast<CheckBox>().CurrentValue; } }
         public static int EModeStringList { get { return CondemnSettings["emode"].Cast<Slider>().CurrentValue; } }
         public static bool UseEInterruptBool { get { return CondemnSettings["useeinterrupt"].Cast<CheckBox>().CurrentValue; } }
@@ -1044,8 +1044,7 @@ namespace Vayne
             ComboMenu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
             ComboMenu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
             ComboMenu.AddSeparator();
-            ComboMenu.Add("user", new CheckBox("Use R In Combo", false)); // UseRBool
-            ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
+            ComboMenu.Add("user", new KeyBind("Use R In Combo", false, KeyBind.BindTypes.PressToggle, 'A')); // UseRBool
             ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
             ComboMenu.AddSeparator();
 
@@ -1053,7 +1052,7 @@ namespace Vayne
             QSettings.AddGroupLabel("Q Settings");
             QSettings.AddSeparator();
             QSettings.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR | 4 : Sharpshooter | 5 : SAC");
-            QSettings.Add("qmode", new Slider("Q Mode:", 3, 1, 5)); // QModeStringList
+            QSettings.Add("qmode", new Slider("Q Mode:", 5, 1, 5)); // QModeStringList
             QSettings.AddSeparator();
             QSettings.AddGroupLabel("VHR Q Settings");
             QSettings.AddLabel("YOU HAVE TO HAVE OPTION 3 SELECTED TO USE THIS");
