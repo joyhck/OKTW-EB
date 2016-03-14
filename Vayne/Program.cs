@@ -646,7 +646,8 @@ namespace Vayne
                                         {
                                             if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                                             {
-                                                tumblePosition = Game.CursorPos;
+                                                //tumblePosition = Game.CursorPos;
+                                                myHero.Spellbook.CastSpell(SpellSlot.Q, Game.CursorPos);
                                             }
                                         }
                                     }
@@ -736,7 +737,7 @@ namespace Vayne
                                 return;
                             }
                         }
-                        if (mode != 3 || mode != 6 || mode != 7 || mode != 8)
+                        if (mode != 3 || mode != 6 || mode != 7 || mode != 8 || mode != 4)
                         {
                             myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
                         }
