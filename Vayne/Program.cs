@@ -15,11 +15,13 @@ namespace Vayne
 {
     public static class Program
     {
-
+        #region Instance Variables
         private static Spell.Skillshot Q, E2;
         private static Spell.Targeted E;
-        private static Spell.Active W, R;
+        private static Spell.Active W, R, cleanse;
+        #endregion
 
+        #region Init
         public static void Main()
         {
             Loading.OnLoadingComplete += OnLoad;
@@ -29,6 +31,7 @@ namespace Vayne
         {
             get { return Player.Instance; }
         }
+        #endregion
 
         #region ctor
         private static void OnLoad(EventArgs args)
@@ -38,6 +41,13 @@ namespace Vayne
             E = new Spell.Targeted(SpellSlot.E, 550);
             R = new Spell.Active(SpellSlot.R);
             E2 = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Linear, (int)0.42f, 1300, 50);
+
+            var clean = Player.Spells.FirstOrDefault(o => o.SData.Name == "SummonerBoost");
+            if (clean != null)
+            {
+                SpellSlot cleanses = EloBuddy.SDK.Extensions.GetSpellSlotFromName(myHero, "SummonerBoost");
+                cleanse = new Spell.Active(cleanses);
+            }
 
             InitMenu();
             Game.OnUpdate += OnUpdate;
@@ -51,8 +61,113 @@ namespace Vayne
 
         #region Events
 
+        private static void Clean()
+        {
+            if (Item.CanUseItem(ItemId.Quicksilver_Sash))
+                Core.DelayAction(delegate { Item.UseItem(ItemId.Quicksilver_Sash); }, CSSDelay);
+            else if (Item.CanUseItem(ItemId.Mercurial_Scimitar))
+                Core.DelayAction(delegate { Item.UseItem(ItemId.Mercurial_Scimitar); }, CSSDelay);
+            else if (Item.CanUseItem(ItemId.Dervish_Blade))
+                Core.DelayAction(delegate { Item.UseItem(ItemId.Dervish_Blade); }, CSSDelay);
+            else if (cleanse != null && cleanse.IsReady())
+                Core.DelayAction(delegate { cleanse.Cast(); }, CSSDelay);
+        }
+
+        private static void Cleansers()
+        {
+            if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade) && !cleanse.IsReady())
+                return;
+
+            if (myHero.HealthPercent >= (float)cleanHP || !_Clean)
+                return;
+
+            if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague"))
+                Clean();
+
+            if (Item.CanUseItem(ItemId.Mikaels_Crucible))
+            {
+                foreach (var ally in EntityManager.Heroes.Allies.Where(ally => ally.IsValid && !ally.IsDead && ItemMenu["MikaelsAlly" + ally.ChampionName].Cast<CheckBox>().CurrentValue && myHero.Distance(ally.Position) < 750 && ally.HealthPercent < (float)cleanHP))
+                {
+                    if (ally.HasBuff("zedrdeathmark") || ally.HasBuff("FizzMarinerDoom") || ally.HasBuff("MordekaiserChildrenOfTheGrave") || ally.HasBuff("PoppyDiplomaticImmunity") || ally.HasBuff("VladimirHemoplague"))
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Stun) && Stun)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Snare) && Snare)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Charm) && Charm)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Fear) && Fear)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Stun) && Stun)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Taunt) && Taunt)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Suppression) && Suppression)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                    if (ally.HasBuffOfType(BuffType.Blind) && Blind)
+                        Item.UseItem(ItemId.Mikaels_Crucible, ally);
+                }
+            }
+
+            if (myHero.HasBuffOfType(BuffType.Stun) && Stun)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Snare) && Snare)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Charm) && Charm)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Fear) && Fear)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Stun) && Stun)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Taunt) && Taunt)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Suppression) && Suppression)
+                Clean();
+            if (myHero.HasBuffOfType(BuffType.Blind) && Blind)
+                Clean();
+        }
+
         public static void OnUpdate(EventArgs args)
         {
+            Cleansers();
+
+            if (Item.CanUseItem(ItemId.Blade_of_the_Ruined_King) && useBotrk)
+            {
+                var t = TargetSelector.GetTarget(550, DamageType.Physical);
+                if (t.IsValidTarget())
+                {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    {
+                        Item.UseItem(ItemId.Blade_of_the_Ruined_King, t);
+                    }
+                }
+            }
+
+            if (Item.CanUseItem(ItemId.Bilgewater_Cutlass) && useCutlass)
+            {
+                var t = TargetSelector.GetTarget(550, DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    {
+                        Item.UseItem(ItemId.Bilgewater_Cutlass, t);
+                    }
+                }
+            }
+
+            if (Item.CanUseItem(ItemId.Youmuus_Ghostblade) && useGhostBlade)
+            {
+                var t = TargetSelector.GetTarget(750, DamageType.Magical);
+
+                if (t.IsValidTarget() && t is AIHeroClient)
+                {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    {
+                        Item.UseItem(ItemId.Youmuus_Ghostblade);
+                    }
+                }
+            }
+
             if (myHero.CountEnemiesInRange(550 + 200) >= GetAutoR && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 R.Cast();
@@ -782,11 +897,25 @@ namespace Vayne
         public static bool DontQIntoEnemies { get { return QSettings["DontQIntoEnemies"].Cast<CheckBox>().CurrentValue; } }
         public static bool Wall { get { return QSettings["Wall"].Cast<CheckBox>().CurrentValue; } }
         public static bool Only2W { get { return QSettings["Only2W"].Cast<CheckBox>().CurrentValue; } }
+        public static int CSSDelay { get { return ItemMenu["CSSDelay"].Cast<Slider>().CurrentValue; } }
+        public static int cleanHP { get { return ItemMenu["cleanHP"].Cast<Slider>().CurrentValue; } }
+        public static bool CleanSpells { get { return ItemMenu["CleanSpells"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Stun { get { return ItemMenu["Stun"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Snare { get { return ItemMenu["Snare"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Charm { get { return ItemMenu["Charm"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Fear { get { return ItemMenu["Fear"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Suppression { get { return ItemMenu["Suppression"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Taunt { get { return ItemMenu["Taunt"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Blind { get { return ItemMenu["Blind"].Cast<CheckBox>().CurrentValue; } }
+        public static bool _Clean { get { return ItemMenu["Clean"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useBotrk { get { return ItemMenu["useBotrk"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useCutlass { get { return ItemMenu["useCutlass"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useGhostBlade { get { return ItemMenu["useGhostBlade"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
 
-        private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu;
+        private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu, ItemMenu;
 
         private static void InitMenu()
         {
@@ -884,6 +1013,32 @@ namespace Vayne
             ExtraMenu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
             ExtraMenu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
             ExtraMenu.AddSeparator();
+
+            ItemMenu = Menu.AddSubMenu("Activator", "item");
+            ItemMenu.Add("useBotrk", new CheckBox("Use Blade of the Ruined King?"));
+            ItemMenu.Add("useCutlass", new CheckBox("Use Bilgewater Cutlass?"));
+            ItemMenu.Add("useGhostBlade", new CheckBox("Use GhostBlade?"));
+            ItemMenu.AddSeparator();
+            ItemMenu.Add("Clean", new CheckBox("Auto QSS/Mercurial/Dervish/Mikaels/Cleanse"));
+            ItemMenu.AddSeparator();
+            ItemMenu.Add("CSSDelay", new Slider("QSS Delay", 0, 0, 1000)); // CSSDelay
+            ItemMenu.AddSeparator();
+            foreach (var ally in ObjectManager.Get<AIHeroClient>().Where(ally => ally.IsAlly))
+            {
+                ItemMenu.Add("MikaelsAlly" + ally.ChampionName, new CheckBox("Mikael : " + ally.ChampionName + "?"));
+            }
+            ItemMenu.AddSeparator();
+            ItemMenu.Add("cleanHP", new Slider("Use only under % HP", 95, 0, 100));  // cleanHP
+            ItemMenu.AddSeparator();
+            ItemMenu.Add("CleanSpells", new CheckBox("Cleanse Dangerous (Zed R etc.)"));
+            ItemMenu.Add("Stun", new CheckBox("Stun"));
+            ItemMenu.Add("Snare", new CheckBox("Snare"));
+            ItemMenu.Add("Charm", new CheckBox("Charm"));
+            ItemMenu.Add("Fear", new CheckBox("Fear"));
+            ItemMenu.Add("Suppression", new CheckBox("Suppression"));
+            ItemMenu.Add("Taunt", new CheckBox("Taunt"));
+            ItemMenu.Add("Blind", new CheckBox("Blind"));
+            ItemMenu.AddSeparator();
 
             DrawingMenu = Menu.AddSubMenu("Draw Settings", "draw");
             DrawingMenu.AddGroupLabel("Drawing Menu");
