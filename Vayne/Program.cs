@@ -1488,7 +1488,7 @@ namespace Vayne
         public static bool Cqspam { get { return QSettings["Cqspam"].Cast<CheckBox>().CurrentValue; } }
         public static bool drawCurrentLogic { get { return DrawingMenu["drawCurrentLogic"].Cast<CheckBox>().CurrentValue; } }
         public static bool dontaa { get { return ComboMenu["dontaa"].Cast<KeyBind>().CurrentValue; } }
-        public static bool onlyCondemnTarget { get { return CondemnSettings["onlyCondemnTarget"].Cast<KeyBind>().CurrentValue; } }
+        public static bool onlyCondemnTarget { get { return CondemnSettings["onlyCondemnTarget"].Cast<CheckBox>().CurrentValue; } }
 
         #endregion
 
