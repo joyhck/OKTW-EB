@@ -345,6 +345,20 @@ namespace Vayne
                                     }
                                 }
                                 break;
+                            case 5: // Synx Auto Carry
+                                if (target is AIHeroClient)
+                                {
+                                    if (Q.IsReady())
+                                    {
+                                        Vector3 pos = FindTumblePosition(target as AIHeroClient);
+
+                                        if (pos.IsValid())
+                                        {
+                                            tumblePosition = pos;
+                                        }
+                                    }
+                                }
+                                break;
                             default:
                                 tumblePosition = Game.CursorPos;
                                 break;
@@ -758,6 +772,16 @@ namespace Vayne
         public static bool noqenemies { get { return Menu["noqenemies"].Cast<CheckBox>().CurrentValue; } }
         public static bool noqenemiesold { get { return Menu["noqenemiesold"].Cast<CheckBox>().CurrentValue; } }
         public static bool antiMelee { get { return Menu["antiMelee"].Cast<CheckBox>().CurrentValue; } }
+        public static int Accuracy { get { return Menu["Accuracy"].Cast<Slider>().CurrentValue; } }
+        public static int TumbleCondemnCount { get { return Menu["TumbleCondemnCount"].Cast<Slider>().CurrentValue; } }
+        public static int sacMode { get { return Menu["sacMode"].Cast<Slider>().CurrentValue; } }
+        public static bool TumbleCondemn { get { return Menu["TumbleCondemn"].Cast<CheckBox>().CurrentValue; } }
+        public static bool TumbleCondemnSafe { get { return Menu["TumbleCondemnSafe"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontCondemnTurret { get { return Menu["DontCondemnTurret"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontSafeCheck { get { return Menu["DontSafeCheck"].Cast<CheckBox>().CurrentValue; } }
+        public static bool DontQIntoEnemies { get { return Menu["DontQIntoEnemies"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Wall { get { return Menu["Wall"].Cast<CheckBox>().CurrentValue; } }
+        public static bool Only2W { get { return Menu["Only2W"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
@@ -767,20 +791,21 @@ namespace Vayne
         private static void InitMenu()
         {
             Menu = MainMenu.AddMenu("Vayne", "Vayne");
-            Menu.AddLabel("Ported from Challenger Series - Berb");
+            Menu.AddLabel("Base Ported from Challenger Series & features ported from many other assemblies on L# - Berb");
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Combo");
-            Menu.Add("useq", new CheckBox("Auto Q")); // UseQBool
+            Menu.Add("useq", new CheckBox("Use Q")); // UseQBool
             Menu.AddSeparator();
-            Menu.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR | 4 : Sharpshooter");
-            Menu.Add("qmode", new Slider("Q Mode:", 1, 1, 4)); // QModeStringList
+            Menu.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR | 4 : Sharpshooter | 5 : SAC");
+            Menu.Add("qmode", new Slider("Q Mode:", 3, 1, 5)); // QModeStringList
             Menu.AddSeparator();
             Menu.AddLabel("1 : Never | 2 : E-Not-Ready | 3 : Always");
-            Menu.Add("qantigc", new Slider("Use Q Antigapcloser:", 1, 1, 3)); // UseQAntiGapcloserStringList
+            Menu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
             Menu.AddSeparator();
             Menu.Add("focus2w", new CheckBox("Try To Focus 2W", false)); // TryToFocus2WBool
             Menu.Add("dontattackwhileinvisible", new CheckBox("Smart Invisible Attacking")); // DontAttackWhileInvisibleAndMeelesNearBool
+            Menu.AddSeparator();
             Menu.Add("user", new CheckBox("Use R In Combo", false)); // UseRBool
             Menu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
             Menu.AddSeparator();
@@ -793,9 +818,19 @@ namespace Vayne
             Menu.Add("noqenemiesold", new CheckBox("Use Old Don't Q into enemies", true)); // noqenemiesold
             Menu.AddSeparator();
 
-            Menu.AddGroupLabel("Sharpshooter Settings");
+            Menu.AddGroupLabel("Sharpshooter Q Settings");
             Menu.AddLabel("YOU HAVE TO HAVE OPTION 4 SELECTED TO USE THIS");
             Menu.Add("antiMelee", new CheckBox("Use Anti-Melee (Q)", true)); // antiMelee
+            Menu.AddSeparator();
+
+            Menu.AddGroupLabel("Synx Auto Carry Q Settings");
+            Menu.AddLabel("YOU HAVE TO HAVE OPTION 5 SELECTED TO USE THIS");
+            Menu.AddLabel("1 : Auto Position | 2 : Mouse Cursor");
+            Menu.Add("sacMode", new Slider("Q Mode: ", 1, 1, 2)); // sacMode
+            Menu.Add("DontSafeCheck", new CheckBox("Dont check tumble position is safe", true)); // DontSafeCheck
+            Menu.Add("DontQIntoEnemies", new CheckBox("Dont Q Into Enemies", true)); // DontQIntoEnemies
+            Menu.Add("Wall", new CheckBox("Always Tumble to wall if possible", true)); // Wall
+            Menu.Add("Only2W", new CheckBox("Tumble only when enemy has 2 w stacks", false)); // Only2W
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Condemn Menu");
@@ -804,7 +839,8 @@ namespace Vayne
             Menu.AddLabel("1 : Prada Smart | 2 : Prada Perfect | 3 : Marksman");
             Menu.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
             Menu.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
-            Menu.Add("emode", new Slider("E Mode: ", 1, 1, 9)); // EModeStringList
+            Menu.AddLabel("10 : Synx Auto Carry");
+            Menu.Add("emode", new Slider("E Mode: ", 2, 1, 10)); // EModeStringList
             Menu.AddSeparator();
             Menu.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
             Menu.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
@@ -816,14 +852,24 @@ namespace Vayne
             Menu.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.PressToggle, 'E')); // SemiAutomaticCondemnKey
             Menu.AddSeparator();
 
-            Menu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc Before LVL: ", false)); // UseEAs3rdWProcBool
-            Menu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
-            Menu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
+            Menu.AddGroupLabel("SAC Condemn Settings");
+            Menu.AddLabel("YOU HAVE TO HAVE OPTION 10 SELECTED TO USE THIS");
+            Menu.Add("Accuracy", new Slider("Accuracy", 12, 2, 12)); // Accuracy
+            Menu.Add("TumbleCondemn", new CheckBox("Q->E when possible")); // TumbleCondemn
+            Menu.Add("TumbleCondemnCount", new Slider("Q->E Position Check Count", 12, 2, 12)); // TumbleCondemnCount
+            Menu.Add("TumbleCondemnSafe", new CheckBox("Only Q->E when tumble position is safe", false)); // TumbleCondemnSafe
+            Menu.Add("DontCondemnTurret", new CheckBox("Don't Condemn under turret?", true)); // TumbleCondemnSafe
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Farm Menu");
-            Menu.Add("useqfarm", new CheckBox("Use Q")); // UseQFarm
+            Menu.Add("useqfarm", new CheckBox("Use Q Farm/Jungle")); // UseQFarm
             Menu.Add("useejgfarm", new CheckBox("Use E Jungle")); // UseEJungleFarm
+            Menu.AddSeparator();
+
+            Menu.AddGroupLabel("Extra Settings");
+            Menu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc Before LVL: ", false)); // UseEAs3rdWProcBool
+            Menu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
+            Menu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
             Menu.AddSeparator();
 
             Menu.AddGroupLabel("Drawing Menu");
@@ -1004,6 +1050,180 @@ namespace Vayne
                 return true;
             }
 
+            if (mode == 10)
+            {
+                if (IsValidTarget(hero))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool IsValidTarget(AIHeroClient target)
+        {
+            var targetPosition = Geometry.PositionAfter(target.GetWaypoints(), 300, (int)target.MoveSpeed);
+
+            if (target.Distance(ObjectManager.Player.ServerPosition) < 650f && IsCondemnable(ObjectManager.Player.ServerPosition.To2D(), targetPosition, target.BoundingRadius))
+            {
+                if (target.Path.Length == 0)
+                {
+                    var outRadius = (0.3f * target.MoveSpeed) / (float)Math.Cos(2 * Math.PI / Accuracy);
+                    int count = 0;
+                    for (int i = 1; i <= Accuracy; i++)
+                    {
+                        if (count + (Accuracy - i) < Accuracy / 3)
+                            return false;
+
+                        var angle = i * 2 * Math.PI / Accuracy;
+                        float x = target.Position.X + outRadius * (float)Math.Cos(angle);
+                        float y = target.Position.Y + outRadius * (float)Math.Sin(angle);
+                        if (IsCondemnable(ObjectManager.Player.ServerPosition.To2D(), new Vector2(x, y), target.BoundingRadius))
+                            count++;
+                    }
+                    return count >= Accuracy / 3;
+                }
+                else
+                    return true;
+            }
+            else
+            {
+                if (TumbleCondemn && Q.IsReady())
+                {
+                    var outRadius = 300 / (float)Math.Cos(2 * Math.PI / TumbleCondemnCount);
+
+                    for (int i = 1; i <= TumbleCondemnCount; i++)
+                    {
+                        var angle = i * 2 * Math.PI / TumbleCondemnCount;
+                        float x = ObjectManager.Player.Position.X + outRadius * (float)Math.Cos(angle);
+                        float y = ObjectManager.Player.Position.Y + outRadius * (float)Math.Sin(angle);
+                        targetPosition = Geometry.PositionAfter(target.GetWaypoints(), 300, (int)target.MoveSpeed);
+                        var vec = new Vector2(x, y);
+                        if (targetPosition.Distance(vec) < 550f && IsCondemnable(vec, targetPosition, target.BoundingRadius, 300f))
+                        {
+                            if (!TumbleCondemnSafe || IsSafe(target, vec.To3D(), false).IsValid())
+                            {
+                                myHero.Spellbook.CastSpell(SpellSlot.Q, (Vector3)vec);
+                                break;
+                            }
+                        }
+                    }
+
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        internal static Vector2 Deviation(Vector2 point1, Vector2 point2, double angle)
+        {
+            angle *= Math.PI / 180.0;
+            Vector2 temp = Vector2.Subtract(point2, point1);
+            Vector2 result = new Vector2(0);
+            result.X = (float)(temp.X * Math.Cos(angle) - temp.Y * Math.Sin(angle)) / 4;
+            result.Y = (float)(temp.X * Math.Sin(angle) + temp.Y * Math.Cos(angle)) / 4;
+            result = Vector2.Add(result, point1);
+            return result;
+        }
+
+        public static Vector3 IsSafe(AIHeroClient target, Vector3 vec, bool checkTarget = true)
+        {
+            if (DontSafeCheck)
+                return vec;
+
+            if (checkTarget)
+            {
+                if (target.ServerPosition.To2D().Distance(vec) <= target.AttackRange)
+                {
+                    if (vec.CountEnemiesInRange(1000) > 1)
+                        return Vector3.Zero;
+                    else if (target.ServerPosition.To2D().Distance(vec) <= target.AttackRange / 2f)
+                        return Deviation(ObjectManager.Player.ServerPosition.To2D(), target.ServerPosition.To2D(), 60).To3D();
+                }
+
+                if (((DontQIntoEnemies || target.IsMelee) && EntityManager.Heroes.Enemies.Any(p => p.ServerPosition.To2D().Distance(vec) <= p.AttackRange + ObjectManager.Player.BoundingRadius + (p.IsMelee ? 100 : 0))) || vec.UnderTurret(true))
+                    return Vector3.Zero;
+            }
+            if (EntityManager.Heroes.Enemies.Any(p => p.NetworkId != target.NetworkId && p.ServerPosition.To2D().Distance(vec) <= p.AttackRange + (p.IsMelee ? 50 : 0)) || vec.UnderTurret(true))
+                return Vector3.Zero;
+
+            return vec;
+        }
+
+        public static Vector3 FindTumblePosition(AIHeroClient target)
+        {
+            if ((Only2W) && target.GetBuffCount("vaynesilvereddebuff") == 1) // == 1 cuz calling this after attack which is aa missile still flying
+                return Vector3.Zero;
+
+            if (Wall)
+            {
+                var outRadius = ObjectManager.Player.BoundingRadius / (float)Math.Cos(2 * Math.PI / 8);
+
+                for (var i = 1; i <= 8; i++)
+                {
+                    var angle = i * 2 * Math.PI / 8;
+                    float x = ObjectManager.Player.Position.X + outRadius * (float)Math.Cos(angle);
+                    float y = ObjectManager.Player.Position.Y + outRadius * (float)Math.Sin(angle);
+                    var colFlags = NavMesh.GetCollisionFlags(x, y);
+                    if (colFlags.HasFlag(CollisionFlags.Wall) || colFlags.HasFlag(CollisionFlags.Building))
+                        return new Vector3(x, y, 0);
+                }
+            }
+
+            if (sacMode == 0)
+            {
+                Vector3 vec = target.ServerPosition;
+
+                if (target.Path.Length > 0)
+                {
+                    if (ObjectManager.Player.Distance(vec) < ObjectManager.Player.Distance(target.Path.Last()))
+                        return IsSafe(target, Game.CursorPos);
+                    else
+                        return IsSafe(target, Game.CursorPos.To2D().Rotated(DegreeToRadian((vec - ObjectManager.Player.ServerPosition).To2D().AngleBetween((Game.CursorPos - ObjectManager.Player.ServerPosition).To2D()) % 90)).To3D());
+                }
+                else
+                {
+                    if (target.IsMelee)
+                        return IsSafe(target, Game.CursorPos);
+                }
+
+                return IsSafe(target, ObjectManager.Player.ServerPosition + (target.ServerPosition - ObjectManager.Player.ServerPosition).Normalized().To2D().Rotated(DegreeToRadian(90 - (vec - ObjectManager.Player.ServerPosition).To2D().AngleBetween((Game.CursorPos - ObjectManager.Player.ServerPosition).To2D()))).To3D() * 300f);
+            }
+            else if (sacMode == 1)
+            {
+                return Game.CursorPos;
+            }
+
+            return Vector3.Zero;
+        }
+
+        private static bool IsCondemnable(Vector2 from, Vector2 targetPosition, float boundingRadius, float pushRange = -1)
+        {
+            if (pushRange == -1)
+                pushRange = EPushDistanceSlider - 20f;
+
+            var pushDirection = (targetPosition - from).Normalized();
+            for (int i = 0; i < pushRange; i += 20)
+            {
+                var lastPost = targetPosition + (pushDirection * i);
+                if (!lastPost.To3D().UnderTurret(true) || !DontCondemnTurret)
+                {
+                    var colFlags = NavMesh.GetCollisionFlags(lastPost.X, lastPost.Y);
+                    if (colFlags.HasFlag(CollisionFlags.Wall) || colFlags.HasFlag(CollisionFlags.Building))
+                    {
+                        var sideA = lastPost + pushDirection * 20f + (pushDirection.Perpendicular() * boundingRadius);
+                        var sideB = lastPost + pushDirection * 20f - (pushDirection.Perpendicular() * boundingRadius);
+
+                        var flagsA = NavMesh.GetCollisionFlags(sideA.X, sideA.Y);
+                        var flagsB = NavMesh.GetCollisionFlags(sideB.X, sideB.Y);
+
+                        if ((flagsA.HasFlag(CollisionFlags.Wall) || flagsA.HasFlag(CollisionFlags.Building)) && (flagsB.HasFlag(CollisionFlags.Wall) || flagsB.HasFlag(CollisionFlags.Building)))
+                            return true;
+                    }
+                }
+            }
             return false;
         }
 
