@@ -398,6 +398,88 @@ namespace Vayne
                 {
                     Drawing.DrawText(x, y + 50, Color.DarkGray, "Don't AA in R? : " + dontaa);
                 }
+
+                if (drawCurrentLogic)
+                {
+
+                    if (QModeStringList == 1)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Prada");
+                    }
+                    else if (QModeStringList == 2)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Marksman");
+                    }
+                    else if (QModeStringList == 3)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : VHR/SOLO");
+                    }
+                    else if (QModeStringList == 4)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Sharpshooter");
+                    }
+                    else if (QModeStringList == 5)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Synx Auto Carry");
+                    }
+                    else if (QModeStringList == 6)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : To Cursor");
+                    }
+                    else if (QModeStringList == 7)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kite Melee");
+                    }
+                    else if (QModeStringList == 8)
+                    {
+                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kurisu");
+                    }
+
+                    if (EModeStringList == 1)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Smart");
+                    }
+                    else if (EModeStringList == 2)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Perfect");
+                    }
+                    else if (EModeStringList == 3)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Marksman");
+                    }
+                    else if (EModeStringList == 4)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Sharpshooter");
+                    }
+                    else if (EModeStringList == 5)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Gosu");
+                    }
+                    else if (EModeStringList == 6)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : VHR");
+                    }
+                    else if (EModeStringList == 7)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Legacy");
+                    }
+                    else if (EModeStringList == 8)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Fastest");
+                    }
+                    else if (EModeStringList == 9)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Old Prada");
+                    }
+                    else if (EModeStringList == 10)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Synx Auto Carry");
+                    }
+                    else if (EModeStringList == 11)
+                    {
+                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : OKTW");
+                    }
+                }
             }
             if (DrawWStacksBool)
             {
@@ -1402,6 +1484,7 @@ namespace Vayne
         public static bool Cnoqenemies { get { return QSettings["Cnoqenemies"].Cast<CheckBox>().CurrentValue; } }
         public static bool Cnoqenemiesold { get { return QSettings["Cnoqenemiesold"].Cast<CheckBox>().CurrentValue; } }
         public static bool Cqspam { get { return QSettings["Cqspam"].Cast<CheckBox>().CurrentValue; } }
+        public static bool drawCurrentLogic { get { return DrawingMenu["drawCurrentLogic"].Cast<CheckBox>().CurrentValue; } }
         public static bool dontaa { get { return ComboMenu["dontaa"].Cast<KeyBind>().CurrentValue; } }
 
         #endregion
@@ -1553,6 +1636,7 @@ namespace Vayne
             DrawingMenu.AddSeparator();
             DrawingMenu.Add("drawwstacks", new CheckBox("Draw W Stacks")); // DrawWStacksBool
             DrawingMenu.Add("menukey", new CheckBox("Draw Menu Keybinds")); // DrawWStacksBool
+            DrawingMenu.Add("drawCurrentLogic", new CheckBox("Draw Q/E Current Logic")); // DrawWStacksBool
             DrawingMenu.AddSeparator();
         }
 
