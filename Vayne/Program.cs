@@ -509,6 +509,19 @@ namespace Vayne
                                 tumblePosition = Game.CursorPos;
                                 break;
                         }
+
+                        var _smartQPosition = GetSmartQPosition();
+                        var _smartQCheck = _smartQPosition != Vector3.Zero;
+                        var _QPosition = _smartQCheck ? _smartQPosition : Game.CursorPos;
+
+                        var afterTumblePosition = ObjectManager.Player.ServerPosition.Extend(_QPosition, 300f);
+                        var distanceToTarget = afterTumblePosition.Distance(target.Position, true);
+
+                        if (((distanceToTarget < Math.Pow(ObjectManager.Player.AttackRange + 65, 2) && distanceToTarget > 110 * 110) || qspam) && mode == 3)
+                        {
+                            myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
+                        }
+
                         if ((tumblePosition.Distance(myHero.Position) > 2000 || IsDangerousPosition(tumblePosition)))
                         {
                             if (mode != 3)
@@ -516,7 +529,11 @@ namespace Vayne
                                 return;
                             }
                         }
-                        myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
+
+                        if (mode != 3)
+                        {
+                            myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
+                        }
                     }
                 }
             }
