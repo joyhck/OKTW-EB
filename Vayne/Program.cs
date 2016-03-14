@@ -199,7 +199,7 @@ namespace Vayne
                 }
             }
 
-            if (myHero.CountEnemiesInRange(550 + 200) >= GetAutoR && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            if (myHero.CountEnemiesInRange(550 + 200) >= GetAutoR && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && UseRBool)
             {
                 R.Cast();
             }
