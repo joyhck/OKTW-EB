@@ -1085,7 +1085,7 @@ namespace Vayne
             CondemnSettings.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
             CondemnSettings.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
             CondemnSettings.AddLabel("10 : Synx Auto Carry");
-            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 10)); // EModeStringList
+            CondemnSettings.Add("emode", new Slider("E Mode: ", 10, 1, 10)); // EModeStringList
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
             CondemnSettings.Add("useeantigapcloser", new CheckBox("Use E AntiGapcloser")); // UseEAntiGapcloserBool
