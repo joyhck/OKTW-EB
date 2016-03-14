@@ -558,13 +558,14 @@ namespace Vayne
         public static List<Vector3> GetRotatedQPositions()
         {
             const int currentStep = 30;
-            var direction = (Game.CursorPos - myHero.ServerPosition).Normalized().To2D();
+            // var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
+            var direction = (Game.CursorPos - ObjectManager.Player.ServerPosition).Normalized().To2D();
 
             var list = new List<Vector3>();
             for (var i = -70; i <= 70; i += currentStep)
             {
                 var angleRad = DegreeToRadian(i);
-                var rotatedPosition = myHero.Position.To2D() + (300f * direction.Rotated(angleRad));
+                var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
                 list.Add(rotatedPosition.To3D());
             }
             return list;
@@ -612,7 +613,7 @@ namespace Vayne
             var positions = GetRotatedQPositions();
             var enemyPositions = GetEnemyPoints();
             var safePositions = positions.Where(pos => !enemyPositions.Contains(pos.To2D())).ToList();
-            var BestPosition = myHero.ServerPosition.Extend(Game.CursorPos, 300f);
+            var BestPosition = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f);
             var AverageDistanceWeight = .60f;
             var ClosestDistanceWeight = .40f;
 
@@ -622,14 +623,14 @@ namespace Vayne
 
             var alliesNear = EntityManager.Heroes.Allies.Count(ally => !ally.IsMe && ally.IsValidTarget(1500f, false));
 
-            var enemiesNear = EntityManager.Heroes.Enemies.Where(m => m.IsValidTarget(myHero.GetAutoAttackRange() + 300f + 65f)).ToList();
+            var enemiesNear = EntityManager.Heroes.Enemies.Where(m => m.IsValidTarget(m.GetAutoAttackRange() + 300f + 65f)).ToList();
             #endregion
 
             #region 1 Enemy around only
-            if (myHero.CountEnemiesInRange(1500f) <= 1)
+            if (ObjectManager.Player.CountEnemiesInRange(1500f) <= 1)
             {
                 //Logic for 1 enemy near
-                var backwardsPosition = (myHero.ServerPosition.To2D() + 300f * myHero.Direction.To2D()).To3D();
+                var backwardsPosition = (ObjectManager.Player.ServerPosition.To2D() + 300f * ObjectManager.Player.Direction.To2D()).To3D();
 
                 if (!backwardsPosition.UnderTurret(true))
                 {
@@ -773,21 +774,98 @@ namespace Vayne
             return -1;
         }
 
+        public static Obj_AI_Base GetCondemnTarget(Vector3 fromPosition)
+        {
+            return GetTargetVHR(fromPosition);
+        }
+
+        public static Obj_AI_Base GetTargetVHR(Vector3 fromPosition)
+        {
+            var HeroList = EntityManager.Heroes.Enemies.Where(h => h.IsValidTarget(E.Range) && !h.HasBuffOfType(BuffType.SpellShield) && !h.HasBuffOfType(BuffType.SpellImmunity));
+
+            var MinChecksPercent = 25;
+            var PushDistance = EPushDistanceSlider;
+
+            if (PushDistance >= 410)
+            {
+                var PushEx = PushDistance;
+                PushDistance -= (10 + (PushEx - 410) / 2);
+            }
+
+            if (ObjectManager.Player.ServerPosition.UnderTurret(true))
+            {
+                return null;
+            }
+
+            foreach (var Hero in HeroList)
+            {
+                if (Hero.NetworkId != TargetSelector.SelectedTarget.NetworkId)
+                {
+                    continue;
+                }
+
+                if (Hero.Health + 10 <= ObjectManager.Player.GetAutoAttackDamage(Hero) * 2)
+                {
+                    continue;
+                }
+
+                var targetPosition = E2.GetPrediction(Hero).UnitPosition;
+                var finalPosition = targetPosition.Extend(ObjectManager.Player.ServerPosition, -PushDistance);
+                var finalPosition_ex = Hero.ServerPosition.Extend(ObjectManager.Player.ServerPosition, -PushDistance);
+
+                var condemnRectangle = new VHRPolygon(VHRPolygon.Rectangle(targetPosition.To2D(), finalPosition, Hero.BoundingRadius));
+                var condemnRectangle_ex = new VHRPolygon(VHRPolygon.Rectangle(Hero.ServerPosition.To2D(), finalPosition_ex, Hero.BoundingRadius));
+
+                if (IsBothNearWall(Hero))
+                {
+                    return null;
+                }
+
+                if (condemnRectangle.Points.Count(point => NavMesh.GetCollisionFlags(point.X, point.Y).HasFlag(CollisionFlags.Wall)) >= condemnRectangle.Points.Count() * (MinChecksPercent / 100f) && condemnRectangle_ex.Points.Count(point => NavMesh.GetCollisionFlags(point.X, point.Y).HasFlag(CollisionFlags.Wall)) >= condemnRectangle_ex.Points.Count() * (MinChecksPercent / 100f))
+                {
+                    return Hero;
+                }
+            }
+            return null;
+        }
+
+        private static Vector3[] GetWallQPositions(Obj_AI_Base player, float Range)
+        {
+            Vector3[] vList =
+            {
+                (player.ServerPosition.To2D() + Range * player.Direction.To2D()).To3D(),
+                (player.ServerPosition.To2D() - Range * player.Direction.To2D()).To3D()
+
+            };
+            return vList;
+        }
+
+        private static bool IsBothNearWall(Obj_AI_Base target)
+        {
+            var positions = GetWallQPositions(target, 110).ToList().OrderBy(pos => pos.Distance(target.ServerPosition, true));
+            var positions_ex = GetWallQPositions(ObjectManager.Player, 110).ToList().OrderBy(pos => pos.Distance(ObjectManager.Player.ServerPosition, true));
+
+            if (positions.Any(p => p.IsWall()) && positions_ex.Any(p => p.IsWall()))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static Vector3 GetSmartQPosition()
         {
-            if (!E.IsReady())
+            if (!smartq || !E.IsReady())
             {
                 return Vector3.Zero;
             }
 
             const int currentStep = 30;
-            var direction = myHero.Direction.To2D().Perpendicular();
+            var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
             for (var i = 0f; i < 360f; i += currentStep)
             {
-                var angleRad = EloBuddy.SDK.Geometry.DegreeToRadian(i);
-                var rotatedPosition = myHero.Position.To2D() + (300f * direction.Rotated(angleRad));
-                var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
-                if (target.IsValidTarget() && rotatedPosition.To3D().IsSafe())
+                var angleRad = DegreeToRadian(i);
+                var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
+                if (GetCondemnTarget(rotatedPosition.To3D()).IsValidTarget() && rotatedPosition.To3D().IsSafe())
                 {
                     return rotatedPosition.To3D();
                 }
@@ -942,6 +1020,7 @@ namespace Vayne
         public static bool useBotrk { get { return ItemMenu["useBotrk"].Cast<CheckBox>().CurrentValue; } }
         public static bool useCutlass { get { return ItemMenu["useCutlass"].Cast<CheckBox>().CurrentValue; } }
         public static bool useGhostBlade { get { return ItemMenu["useGhostBlade"].Cast<CheckBox>().CurrentValue; } }
+        public static bool smartq { get { return QSettings["smartq"].Cast<CheckBox>().CurrentValue; } }
         #endregion
 
         #region Menu
@@ -967,6 +1046,7 @@ namespace Vayne
             ComboMenu.AddSeparator();
             ComboMenu.Add("user", new CheckBox("Use R In Combo", false)); // UseRBool
             ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
+            ComboMenu.Add("GetAutoR", new Slider("R if >= X enemies : ", 2, 1, 5)); // GetAutoR
             ComboMenu.AddSeparator();
 
             QSettings = Menu.AddSubMenu("Q Settings", "qsettings");
@@ -981,6 +1061,7 @@ namespace Vayne
             QSettings.Add("qspam", new CheckBox("Ignore Q checks", true)); // qspam
             QSettings.Add("noqenemies", new CheckBox("Don't Q into enemies", true)); // noqenemies
             QSettings.Add("noqenemiesold", new CheckBox("Use Old Don't Q into enemies", true)); // noqenemiesold
+            QSettings.Add("smartq", new CheckBox("Try to QE when possible", true)); // noqenemiesold
             QSettings.AddSeparator();
             QSettings.AddGroupLabel("Sharpshooter Q Settings");
             QSettings.AddLabel("YOU HAVE TO HAVE OPTION 4 SELECTED TO USE THIS");
@@ -1603,5 +1684,57 @@ namespace Vayne
         }
 
         #endregion
+    }
+
+    class VHRPolygon
+    {
+        public List<Vector2> Points;
+
+        public VHRPolygon(List<Vector2> p)
+        {
+            Points = p;
+        }
+
+        public void Add(Vector2 vec)
+        {
+            Points.Add(vec);
+        }
+
+        public int Count()
+        {
+            return Points.Count;
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            var result = false;
+            var j = Count() - 1;
+            for (var i = 0; i < Count(); i++)
+            {
+                if (Points[i].Y < point.Y && Points[j].Y >= point.Y || Points[j].Y < point.Y && Points[i].Y >= point.Y)
+                {
+                    if (Points[i].X +
+                        (point.Y - Points[i].Y) / (Points[j].Y - Points[i].Y) * (Points[j].X - Points[i].X) < point.X)
+                    {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
+        }
+        public static List<Vector2> Rectangle(Vector2 startVector2, Vector2 endVector2, float radius)
+        {
+            var points = new List<Vector2>();
+
+            var v1 = endVector2 - startVector2;
+            var to1Side = Vector2.Normalize(v1).Perpendicular() * radius;
+
+            points.Add(startVector2 + to1Side);
+            points.Add(startVector2 - to1Side);
+            points.Add(endVector2 - to1Side);
+            points.Add(endVector2 + to1Side);
+            return points;
+        }
     }
 }
