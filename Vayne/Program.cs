@@ -383,11 +383,20 @@ namespace Vayne
 
                 if (SemiAutomaticCondemnKey)
                 {
-                    Drawing.DrawText(x, y + 50, Color.DeepSkyBlue, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
+                    Drawing.DrawText(x, y + 25, Color.DeepSkyBlue, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
                 }
                 else
                 {
-                    Drawing.DrawText(x, y + 50, Color.DarkGray, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
+                    Drawing.DrawText(x, y + 25, Color.DarkGray, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
+                }
+
+                if (dontaa)
+                {
+                    Drawing.DrawText(x, y + 50, Color.DeepSkyBlue, "Don't AA in R? : " + dontaa);
+                }
+                else
+                {
+                    Drawing.DrawText(x, y + 50, Color.DarkGray, "Don't AA in R? : " + dontaa);
                 }
             }
             if (DrawWStacksBool)
@@ -423,10 +432,11 @@ namespace Vayne
 
             if (myHero.HasBuff("vaynetumblefade"))
             {
-                if (myHero.CountEnemiesInRange(750) >= dontaainr && dontaa)
+                if (dontaa)
                 {
                     args.Process = false;
                 }
+
                 if (EntityManager.Heroes.Enemies.Any(e => e.ServerPosition.Distance(myHero.ServerPosition) < 350 && e.IsMelee) && DontAttackWhileInvisibleAndMeelesNearBool)
                 {
                     args.Process = false;
@@ -1392,7 +1402,6 @@ namespace Vayne
         public static bool Cnoqenemies { get { return QSettings["Cnoqenemies"].Cast<CheckBox>().CurrentValue; } }
         public static bool Cnoqenemiesold { get { return QSettings["Cnoqenemiesold"].Cast<CheckBox>().CurrentValue; } }
         public static bool Cqspam { get { return QSettings["Cqspam"].Cast<CheckBox>().CurrentValue; } }
-        public static int dontaainr { get { return ComboMenu["dontaainr"].Cast<Slider>().CurrentValue; } }
         public static bool dontaa { get { return ComboMenu["dontaa"].Cast<KeyBind>().CurrentValue; } }
 
         #endregion
@@ -1421,7 +1430,6 @@ namespace Vayne
             ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
             ComboMenu.AddSeparator();
             ComboMenu.Add("dontaa", new KeyBind("Don't Auto Attack in R", false, KeyBind.BindTypes.PressToggle, 'T'));
-            ComboMenu.Add("dontaainr", new Slider("Don't Auto Attack in R if >= X enemies", 4, 1, 5));
             ComboMenu.AddSeparator();
 
             QSettings = Menu.AddSubMenu("Q Settings", "qsettings");
