@@ -368,10 +368,11 @@ namespace Vayne
 
         static void Drawing_OnDraw(EventArgs args)
         {
+            var x = myHero.HPBarPosition.X;
+            var y = myHero.HPBarPosition.Y + 200;
+
             if (menuKey)
             {
-                var x = myHero.HPBarPosition.X;
-                var y = myHero.HPBarPosition.Y + 200;
                 if (UseRBool)
                 {
                     Drawing.DrawText(x, y, Color.DeepSkyBlue, "Use R Auto? : " + UseRBool);
@@ -398,96 +399,97 @@ namespace Vayne
                 {
                     Drawing.DrawText(x, y + 50, Color.DarkGray, "Don't AA in R? : " + dontaa);
                 }
+            }
 
-                if (drawCurrentLogic)
+            if (drawCurrentLogic)
+            {
+
+                if (QModeStringList == 1)
                 {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Prada");
+                }
+                else if (QModeStringList == 2)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Marksman");
+                }
+                else if (QModeStringList == 3)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : VHR/SOLO");
+                }
+                else if (QModeStringList == 4)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Sharpshooter");
+                }
+                else if (QModeStringList == 5)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Synx Auto Carry");
+                }
+                else if (QModeStringList == 6)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : To Cursor");
+                }
+                else if (QModeStringList == 7)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kite Melee");
+                }
+                else if (QModeStringList == 8)
+                {
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kurisu");
+                }
 
-                    if (QModeStringList == 1)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Prada");
-                    }
-                    else if (QModeStringList == 2)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Marksman");
-                    }
-                    else if (QModeStringList == 3)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : VHR/SOLO");
-                    }
-                    else if (QModeStringList == 4)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Sharpshooter");
-                    }
-                    else if (QModeStringList == 5)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Synx Auto Carry");
-                    }
-                    else if (QModeStringList == 6)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : To Cursor");
-                    }
-                    else if (QModeStringList == 7)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kite Melee");
-                    }
-                    else if (QModeStringList == 8)
-                    {
-                        Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kurisu");
-                    }
-
-                    if (EModeStringList == 1)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Smart");
-                    }
-                    else if (EModeStringList == 2)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Perfect");
-                    }
-                    else if (EModeStringList == 3)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Marksman");
-                    }
-                    else if (EModeStringList == 4)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Sharpshooter");
-                    }
-                    else if (EModeStringList == 5)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Gosu");
-                    }
-                    else if (EModeStringList == 6)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : VHR");
-                    }
-                    else if (EModeStringList == 7)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Legacy");
-                    }
-                    else if (EModeStringList == 8)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Fastest");
-                    }
-                    else if (EModeStringList == 9)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Old Prada");
-                    }
-                    else if (EModeStringList == 10)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Synx Auto Carry");
-                    }
-                    else if (EModeStringList == 11)
-                    {
-                        Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : OKTW");
-                    }
+                if (EModeStringList == 1)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Smart");
+                }
+                else if (EModeStringList == 2)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Perfect");
+                }
+                else if (EModeStringList == 3)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Marksman");
+                }
+                else if (EModeStringList == 4)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Sharpshooter");
+                }
+                else if (EModeStringList == 5)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Gosu");
+                }
+                else if (EModeStringList == 6)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : VHR");
+                }
+                else if (EModeStringList == 7)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Legacy");
+                }
+                else if (EModeStringList == 8)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Fastest");
+                }
+                else if (EModeStringList == 9)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Old Prada");
+                }
+                else if (EModeStringList == 10)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Synx Auto Carry");
+                }
+                else if (EModeStringList == 11)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : OKTW");
                 }
             }
+
             if (DrawWStacksBool)
             {
                 var target = EntityManager.Heroes.Enemies.FirstOrDefault(enemy => enemy.HasBuff("vaynesilvereddebuff") && enemy.IsValidTarget(2000));
                 if (target.IsValidTarget())
                 {
-                    var x = target.HPBarPosition.X + 50;
-                    var y = target.HPBarPosition.Y - 20;
+                    var xa = target.HPBarPosition.X + 50;
+                    var ya = target.HPBarPosition.Y - 20;
 
                     if (W.Level > 0)
                     {
@@ -496,7 +498,7 @@ namespace Vayne
                         {
                             for (var i = 0; i < 3; i++)
                             {
-                                Drawing.DrawLine(x + i * 20, y, x + i * 20 + 10, y, 10, stacks <= i ? Color.DarkGray : Color.DeepSkyBlue);
+                                Drawing.DrawLine(xa + i * 20, ya, xa + i * 20 + 10, ya, 10, stacks <= i ? Color.DarkGray : Color.DeepSkyBlue);
                             }
                         }
                     }
@@ -1648,7 +1650,6 @@ namespace Vayne
         {
             if (!hero.IsValidTarget(550f) || hero.HasBuffOfType(BuffType.SpellShield) || hero.HasBuffOfType(BuffType.SpellImmunity) || hero.IsDashing()) return false;
 
-            //values for pred calc pP = player position; p = enemy position; pD = push distance
             var pP = myHero.ServerPosition;
             var p = hero.ServerPosition;
             var pD = EPushDistanceSlider;
