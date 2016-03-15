@@ -504,6 +504,10 @@ namespace Vayne
                 {
                     Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : 360 - Hikicarry");
                 }
+                else if (EModeStringList == 15)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : SergixCondemn");
+                }
             }
 
             if (DrawWStacksBool)
@@ -1589,8 +1593,8 @@ namespace Vayne
             CondemnSettings.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
             CondemnSettings.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
             CondemnSettings.AddLabel("10 : Synx Auto Carry | 11 : OKTW | 12 : Shine - HikiCarry");
-            CondemnSettings.AddLabel("13 : Asuna - Hikicarry | 14 : 360 - Hikicarry");
-            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 14)); // EModeStringList
+            CondemnSettings.AddLabel("13 : Asuna - Hikicarry | 14 : 360 - Hikicarry | 15 : SergixCondemn");
+            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 15)); // EModeStringList
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("onlyCondemnTarget", new CheckBox("Only Condemn Current Target", false)); // UseEInterruptBool
             CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
@@ -1941,8 +1945,40 @@ namespace Vayne
                 }
             }
 
+            var position = hero.Position;
+
+            if (mode == 15) // SergixCondemn
+            {
+                var pointwaswall = false;
+                var d = target.Position.Distance(Efinishpos(target));
+                for (var i = 0; i < d; i += 10)
+                {
+                    var dist = i > d ? d : i;
+                    var point = target.Position.Extend(Efinishpos(target), dist);
+                    if (pointwaswall)
+                    {
+                        if (point.IsWall())
+                        {
+                            return true;
+                        }
+                    }
+                    if (point.IsWall())
+                    {
+                        pointwaswall = true;
+                    }
+                }
+            }
+
             return false;
         }
+
+        public static Vector3 Efinishpos(Obj_AI_Base ts)
+        {
+            return myHero.Position.Extend(ts.Position, ObjectManager.Player.Distance(ts.Position) + 490).To3D();
+        }
+
+        public static float CondemnRange = 550f;
+        public static float CondemnKnockback = 490f;
 
         public static List<Vector2> Points = new List<Vector2>();
 
