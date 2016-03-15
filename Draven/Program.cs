@@ -80,6 +80,7 @@ namespace RevampedDraven
         public static bool useQJG { get { return Menu["useQJG"].Cast<CheckBox>().CurrentValue; } }
 
         public static bool onlycatch { get { return Menu["onlycatch"].Cast<CheckBox>().CurrentValue; } }
+        public static int enemyCount { get { return Menu["enemyCount"].Cast<Slider>().CurrentValue; } }
 
         #endregion
 
@@ -101,6 +102,7 @@ namespace RevampedDraven
             Menu.Add("useW", new CheckBox("Use W", true));
             Menu.Add("useE", new CheckBox("Use E", true));
             Menu.Add("useR", new CheckBox("Use R", true));
+            Menu.Add("enemyCount", new Slider("Use R if it will hit X enemies", 2, 1, 5));
             Menu.AddSeparator();
             Menu.AddGroupLabel("Harass");
             Menu.Add("useQH", new CheckBox("Use Q", true));
@@ -136,7 +138,7 @@ namespace RevampedDraven
 
             Q = new Spell.Active(SpellSlot.Q, (uint)myHero.GetAutoAttackRange());
             W = new Spell.Active(SpellSlot.W);
-            E = new Spell.Skillshot(SpellSlot.E, 1000, SkillShotType.Linear, 250, 1400, 130);
+            E = new Spell.Skillshot(SpellSlot.E, 1020, SkillShotType.Linear, 250, 1400, 120);
             R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Linear, 400, 2000, 160);
 
             Game.OnTick += OnUpdate;
@@ -162,11 +164,15 @@ namespace RevampedDraven
         {
             if (!myHero.IsDead)
             {
-                if (drawe && EIsReadyPerfectly())
+                if (drawe && E.IsReady())
+                {
                     Drawing.DrawCircle(myHero.Position, E.Range, Color.Red);
+                }
 
-                if (drawr && RIsReadyPerfectly())
+                if (drawr && R.IsReady())
+                {
                     Drawing.DrawCircle(myHero.Position, R.Range, Color.Red);
+                }
 
                 var DrawCatchAxeRange = drawaxe;
                 if (DrawCatchAxeRange)
@@ -189,15 +195,20 @@ namespace RevampedDraven
         static void Player_OnIssueOrder(Obj_AI_Base sender, PlayerIssueOrderEventArgs args)
         {
             if (catchaxe)
+            {
                 if (sender.IsMe)
+                {
                     if (args.Order == GameObjectOrder.MoveTo)
+                    {
                         if (_bestDropObject != null)
+                        {
                             if (_bestDropObject.IsValid)
+                            {
                                 if (_bestDropObject.Position.Distance(myHero.Position) < 120)
+                                {
                                     if (_bestDropObject.Position.Distance(args.TargetPosition) >= 120)
-                                        for (var i = _bestDropObject.Position.Distance(args.TargetPosition);
-                                            i > 0;
-                                            i = i - 1)
+                                    {
+                                        for (var i = _bestDropObject.Position.Distance(args.TargetPosition); i > 0; i = i - 1)
                                         {
                                             var position = myHero.Position.Extend(args.TargetPosition, i);
                                             if (_bestDropObject.Position.Distance(position) < 120)
@@ -207,46 +218,29 @@ namespace RevampedDraven
                                                 break;
                                             }
                                         }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         static void GameObject_OnDelete(GameObject sender, EventArgs args)
         {
             if (sender.Name == "Draven_Base_Q_reticle_self.troy")
+            {
                 _axeDropObjectDataList.RemoveAll(x => x.Object.NetworkId == sender.NetworkId);
+            }
         }
 
         static void GameObject_OnCreate(GameObject sender, EventArgs args)
         {
             if (sender.Name == "Draven_Base_Q_reticle_self.troy")
-                _axeDropObjectDataList.Add(new AxeDropObjectData
-                {
-                    Object = sender,
-                    ExpireTime = Environment.TickCount + 1200
-                });
-        }
-
-        public static bool QIsReadyPerfectly()
-        {
-            var spell = Q;
-            return spell != null && spell.Slot != SpellSlot.Unknown && spell.State != SpellState.Cooldown && spell.State != SpellState.Disabled && spell.State != SpellState.NoMana && spell.State != SpellState.NotLearned && spell.State != SpellState.Surpressed && spell.State != SpellState.Unknown && spell.State == SpellState.Ready;
-        }
-
-        public static bool WIsReadyPerfectly()
-        {
-            var spell = W;
-            return spell != null && spell.Slot != SpellSlot.Unknown && spell.State != SpellState.Cooldown && spell.State != SpellState.Disabled && spell.State != SpellState.NoMana && spell.State != SpellState.NotLearned && spell.State != SpellState.Surpressed && spell.State != SpellState.Unknown && spell.State == SpellState.Ready;
-        }
-
-        public static bool EIsReadyPerfectly()
-        {
-            var spell = E;
-            return spell != null && spell.Slot != SpellSlot.Unknown && spell.State != SpellState.Cooldown && spell.State != SpellState.Disabled && spell.State != SpellState.NoMana && spell.State != SpellState.NotLearned && spell.State != SpellState.Surpressed && spell.State != SpellState.Unknown && spell.State == SpellState.Ready;
-        }
-
-        public static bool RIsReadyPerfectly()
-        {
-            var spell = R;
-            return spell != null && spell.Slot != SpellSlot.Unknown && spell.State != SpellState.Cooldown && spell.State != SpellState.Disabled && spell.State != SpellState.NoMana && spell.State != SpellState.NotLearned && spell.State != SpellState.Surpressed && spell.State != SpellState.Unknown && spell.State == SpellState.Ready;
+            {
+                _axeDropObjectDataList.Add(new AxeDropObjectData { Object = sender, ExpireTime = Environment.TickCount + 1200 });
+            }
         }
 
         static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
@@ -258,37 +252,67 @@ namespace RevampedDraven
                 if (args.Target.Type == GameObjectType.AIHeroClient)
                 {
                     if (useQ)
+                    {
                         if (AxeCount < 2)
-                            if (QIsReadyPerfectly())
+                        {
+                            if (Q.IsReady())
+                            {
                                 Q.Cast();
+                            }
+                        }
+                    }
                 }
             }
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
             {
                 if (useQH)
+                {
                     if (myHero.IsManaPercentOkay(manaH))
+                    {
                         if (AxeCount < 2)
-                            if (QIsReadyPerfectly())
+                        {
+                            if (Q.IsReady())
+                            {
                                 Q.Cast();
+                            }
+                        }
+                    }
+                }
             }
             else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 if (EntityManager.MinionsAndMonsters.GetLaneMinions().Any(x => x.NetworkId == args.Target.NetworkId))
                 {
                     if (useQLC)
+                    {
                         if (myHero.IsManaPercentOkay(manaLC))
+                        {
                             if (AxeCount < 2)
-                                if (QIsReadyPerfectly())
+                            {
+                                if (Q.IsReady())
+                                {
                                     Q.Cast();
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if (EntityManager.MinionsAndMonsters.GetJungleMonsters().Any(x => x.NetworkId == args.Target.NetworkId))
                 {
                     if (useQJG)
+                    {
                         if (myHero.IsManaPercentOkay(manaJG))
+                        {
                             if (AxeCount < 2)
-                                if (QIsReadyPerfectly())
+                            {
+                                if (Q.IsReady())
+                                {
                                     Q.Cast();
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -296,23 +320,37 @@ namespace RevampedDraven
         private static void OnInterruptableTarget(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
             if (interrupt)
-                if (EIsReadyPerfectly())
+            {
+                if (E.IsReady())
+                {
                     if (sender.IsValidTarget(E.Range))
+                    {
                         E.Cast(sender);
+                    }
+                }
+            }
         }
 
         private static void OnEnemyGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (gapcloser)
-                if (EIsReadyPerfectly())
+            {
+                if (E.IsReady())
+                {
                     if (e.Sender.IsValidTarget(E.Range))
+                    {
                         E.Cast(e.Sender);
+                    }
+                }
+            }
         }
 
         public static bool CanMove(float extraWindup)
         {
             if (LastAATick <= Environment.TickCount)
+            {
                 return (Environment.TickCount + Game.Ping / 2 >= LastAATick + myHero.AttackCastDelay * 1000 + extraWindup);
+            }
             return false;
         }
 
@@ -322,15 +360,13 @@ namespace RevampedDraven
             {
                 var bestObjecta = _axeDropObjectDataList.Where(x => x.Object.IsValid).OrderBy(x => x.ExpireTime).FirstOrDefault();
 
-                if (catchaxe) {
-                    if (onlycatch) {
-                        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.None))
+                if (catchaxe)
+                {
+                    if (bestObjecta != null)
+                    {
+                        if (onlycatch)
                         {
-                            return;
-                        }
-                        else
-                        {
-                            if (bestObjecta != null)
+                            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
                             {
                                 if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
                                 {
@@ -339,7 +375,6 @@ namespace RevampedDraven
                                         Orbwalker.DisableMovement = true;
                                         Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
                                         Orbwalker.DisableMovement = false;
-                                        return;
                                     }
                                     else
                                     {
@@ -351,15 +386,8 @@ namespace RevampedDraven
                                     }
                                 }
                             }
-                            else
-                            {
-                                Orbwalker.DisableMovement = false;
-                            }
                         }
-                    }
-                    else
-                    {
-                        if (bestObjecta != null)
+                        else
                         {
                             if (Game.CursorPos.Distance(bestObjecta.Object.Position) <= catchaxerange)
                             {
@@ -368,7 +396,6 @@ namespace RevampedDraven
                                     Orbwalker.DisableMovement = true;
                                     Orbwalker.OrbwalkTo(ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Name.Equals("Draven_Base_Q_reticle_self.troy")).Position);
                                     Orbwalker.DisableMovement = false;
-                                    return;
                                 }
                                 else
                                 {
@@ -380,22 +407,78 @@ namespace RevampedDraven
                                 }
                             }
                         }
-                        else
-                        {
-                            Orbwalker.DisableMovement = false;
-                        }
+                    }
+                    else
+                    {
+                        Orbwalker.DisableMovement = false;
                     }
                 }
 
-                if (CanMove(100))
+                var tar = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.IsValid && R.IsInRange(x) && (myHero.GetSpellDamage(x, SpellSlot.R) >= x.Health || x.IsKillableAndValidTarget(myHero.GetSpellDamage(x, SpellSlot.R) * 2, DamageType.Physical, R.Range))).FirstOrDefault();
+                if (tar != null)
                 {
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    R.Cast(tar);
+                }
+
+                var tara = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.IsValid && E.IsInRange(x) && myHero.GetSpellDamage(x, SpellSlot.E) >= x.Health).FirstOrDefault();
+                if (tara != null)
+                {
+                    E.Cast(tar);
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                {
+                    if (useW)
                     {
-                        if (useW)
+                        if (W.IsReady())
                         {
-                            if (WIsReadyPerfectly())
+                            if (!myHero.HasBuff("dravenfurybuff"))
                             {
-                                if (!myHero.HasBuff("dravenfurybuff"))
+                                if (EntityManager.Heroes.Enemies.Any(x => x.IsValid && myHero.IsInAutoAttackRange(x)))
+                                {
+                                    W.Cast();
+                                }
+                            }
+                        }
+                    }
+
+                    if (useE && myHero.ManaPercent >= mine)
+                    {
+                        if (E.IsReady())
+                        {
+                            var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+                            if (target != null)
+                            {
+                                myHero.Spellbook.CastSpell(SpellSlot.E, target.Position);
+                            }
+                        }
+                    }
+
+
+                    if (useR)
+                    {
+                        if (R.IsReady())
+                        {
+                            var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+                            if (target != null)
+                            {
+                                if (target.CountEnemiesInRange(R.Range) >= enemyCount)
+                                {
+                                    myHero.Spellbook.CastSpell(SpellSlot.R, target.Position);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    if (useWH)
+                    {
+                        if (ObjectManager.Player.IsManaPercentOkay(manaH))
+                        {
+                            if (W.IsReady())
+                            {
+                                if (!ObjectManager.Player.HasBuff("dravenfurybuff"))
                                 {
                                     if (EntityManager.Heroes.Enemies.Any(x => x.IsValid && myHero.IsInAutoAttackRange(x)))
                                     {
@@ -404,82 +487,58 @@ namespace RevampedDraven
                                 }
                             }
                         }
+                    }
 
-                        if (useE && myHero.ManaPercent >= mine)
+                    if (useEH)
+                    {
+                        if (ObjectManager.Player.IsManaPercentOkay(manaH))
                         {
-                            if (EIsReadyPerfectly())
+                            if (E.IsReady())
                             {
                                 var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                                 if (target != null)
+                                {
                                     E.Cast(target);
-                            }
-                        }
-
-
-                        if (useR)
-                        {
-                            if (RIsReadyPerfectly())
-                            {
-                                var target = EntityManager.Heroes.Enemies.FirstOrDefault(x => !myHero.IsInAutoAttackRange(x) && x.IsKillableAndValidTarget(myHero.GetSpellDamage(x, SpellSlot.R) * 2, DamageType.Physical, R.Range));
-                                if (target != null)
-                                    R.Cast(target);
-                            }
-                        }
-                    }
-                    else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-                    {
-                        if (useWH)
-                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
-                                if (WIsReadyPerfectly())
-                                    if (!ObjectManager.Player.HasBuff("dravenfurybuff"))
-                                        if (EntityManager.Heroes.Enemies.Any(x => x.IsValid && myHero.IsInAutoAttackRange(x)))
-                                            W.Cast();
-
-                        if (useEH)
-                            if (ObjectManager.Player.IsManaPercentOkay(manaH))
-                                if (EIsReadyPerfectly())
-                                {
-                                    var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
-                                    if (target != null)
-                                        E.Cast(target);
                                 }
+                            }
+                        }
                     }
-                    else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                }
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) || Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                {
+                    foreach (var minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, E.Range))
                     {
-                        foreach (var minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, E.Range))
+                        if (useELC)
                         {
-                            if (useELC)
+                            if (ObjectManager.Player.IsManaPercentOkay(manaLC))
                             {
-                                if (ObjectManager.Player.IsManaPercentOkay(manaLC))
+                                if (E.IsReady())
                                 {
-                                    if (EIsReadyPerfectly())
+                                    var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, E.Range);
+                                    var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
+                                    if (farmLocation.HitNumber >= 3)
                                     {
-                                        var minions = EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Enemy, myHero.ServerPosition, E.Range);
-                                        var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
-                                        if (farmLocation.HitNumber >= 3)
-                                        {
-                                            E.Cast(farmLocation.CastPosition);
-                                        }
+                                        E.Cast(farmLocation.CastPosition);
                                     }
                                 }
                             }
-
                         }
 
-                        foreach (var jungleMobs in ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValidTarget(Program.E.Range) && o.Team == GameObjectTeam.Neutral && o.IsVisible && !o.IsDead))
+                    }
+
+                    foreach (var jungleMobs in ObjectManager.Get<Obj_AI_Minion>().Where(o => o.IsValidTarget(Program.E.Range) && o.Team == GameObjectTeam.Neutral && o.IsVisible && !o.IsDead))
+                    {
+                        if (useEJG)
                         {
-                            if (useEJG)
+                            if (ObjectManager.Player.IsManaPercentOkay(manaJG))
                             {
-                                if (ObjectManager.Player.IsManaPercentOkay(manaJG))
+                                if (E.IsReady())
                                 {
-                                    if (EIsReadyPerfectly())
+                                    var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(myHero.ServerPosition, E.Range);
+                                    var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
+                                    if (farmLocation.HitNumber >= 2)
                                     {
-                                        var minions = EntityManager.MinionsAndMonsters.GetJungleMonsters(myHero.ServerPosition, E.Range);
-                                        var farmLocation = EntityManager.MinionsAndMonsters.GetLineFarmLocation(minions, E.Width, (int)E.Range);
-                                        if (farmLocation.HitNumber >= 2)
-                                        {
-                                            E.Cast(farmLocation.CastPosition);
-                                        }
+                                        E.Cast(farmLocation.CastPosition);
                                     }
                                 }
                             }
@@ -494,10 +553,12 @@ namespace RevampedDraven
             return myHero.ManaPercent > manaPercent;
         }
 
-        internal static bool IsKillableAndValidTarget(this AIHeroClient target, double calculatedDamage, DamageType damageType, float distance = float.MaxValue)
+        public static bool IsKillableAndValidTarget(this AIHeroClient target, double calculatedDamage, DamageType damageType, float distance = float.MaxValue)
         {
             if (target == null || !target.IsValidTarget(distance) || target.CharData.BaseSkinName == "gangplankbarrel")
+            {
                 return false;
+            }
 
             if (target.HasBuff("kindredrnodeathbuff"))
             {
@@ -535,24 +596,36 @@ namespace RevampedDraven
             }
 
             if (myHero.HasBuff("summonerexhaust"))
+            {
                 calculatedDamage *= 0.6;
+            }
 
             if (target.ChampionName == "Blitzcrank")
+            {
                 if (!target.HasBuff("manabarriercooldown"))
-                    if (target.Health + target.HPRegenRate +
-                        (damageType == DamageType.Physical ? target.AttackShield : target.MagicShield) +
-                        target.Mana * 0.6 + target.PARRegenRate < calculatedDamage)
+                {
+                    if (target.Health + target.HPRegenRate + (damageType == DamageType.Physical ? target.AttackShield : target.MagicShield) + target.Mana * 0.6 + target.PARRegenRate < calculatedDamage)
+                    {
                         return true;
+                    }
+                }
+            }
+
 
             if (target.ChampionName == "Garen")
+            {
                 if (target.HasBuff("GarenW"))
+                {
                     calculatedDamage *= 0.7;
+                }
+            }
 
             if (target.HasBuff("FerociousHowl"))
+            {
                 calculatedDamage *= 0.3;
+            }
 
             return target.Health + target.HPRegenRate + (damageType == DamageType.Physical ? target.AttackShield : target.MagicShield) < calculatedDamage - 2;
         }
-
     }
 }

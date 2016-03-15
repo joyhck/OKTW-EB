@@ -977,13 +977,7 @@ namespace LeeSin
             }
         }
 
-        private static void WardJump(
-            Vector3 pos,
-            bool m2M = true,
-            bool maxRange = false,
-            bool reqinMaxRange = false,
-            bool minions = true,
-            bool champions = true)
+        private static void WardJump(Vector3 pos, bool m2M = true, bool maxRange = false, bool reqinMaxRange = false, bool minions = true, bool champions = true)
         {
             if (WStage != WCastStage.First)
             {
@@ -1008,6 +1002,7 @@ namespace LeeSin
                     JumpPos = basePos + (newPos.Normalized() * (myHero.Distance(pos)));
                 }
             }
+
             if (JumpPos != new Vector2() && reCheckWard)
             {
                 reCheckWard = false;
@@ -1020,10 +1015,12 @@ namespace LeeSin
                     }                
                 }, 20);
             }
+
             if (m2M)
             {
                 Orbwalk(pos);
             }
+
             if (!W.IsReady() || WStage != WCastStage.First || reqinMaxRange && myHero.Distance(pos) > W.Range)
             {
                 return;
