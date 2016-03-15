@@ -824,27 +824,35 @@ namespace LeeSin
             }
         }
 
-        private static InventorySlot FindBestWardItem()
+        public static InventorySlot FindBestWardItem()
         {
-            var slot = GetWardSlot();
-
-            if (slot == default(InventorySlot))
+            try
             {
-                return null;
-            }
+                var slot = GetWardSlot();
+                if (slot == default(InventorySlot))
+                {
+                    return null;
+                }
 
-            var sdi = GetItemSpell(slot);
-            if (sdi != default(SpellDataInst) && sdi.State == SpellState.Ready)
-            {
+                var sdi = GetItemSpell(slot);
+                if (sdi != default(SpellDataInst) && sdi.State == SpellState.Ready)
+                {
+                    return slot;
+                }
                 return slot;
             }
-            return slot;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+
+            return null;
         }
 
         public static InventorySlot GetWardSlot()
         {
             var wardIds = new[] { 2045, 2049, 2050, 2301, 2302, 2303, 3340, 3361, 3362, 3711, 1408, 1409, 1410, 1411, 2043 };
-            return (from wardId in wardIds where Item.CanUseItem(wardId) select ObjectManager.Player.InventoryItems.FirstOrDefault(slot => slot.Id == (ItemId)wardId)).FirstOrDefault();
+            return (from wardId in wardIds where Item.CanUseItem(wardId)select ObjectManager.Player.InventoryItems.FirstOrDefault(slot => slot.Id == (ItemId)wardId)).FirstOrDefault();
         }
 
         private static SpellDataInst GetItemSpell(InventorySlot invSlot)
@@ -1003,20 +1011,20 @@ namespace LeeSin
             if (JumpPos != new Vector2() && reCheckWard)
             {
                 reCheckWard = false;
-                Core.DelayAction(delegate
+                Core.DelayAction(delegate 
                 {
                     if (JumpPos != new Vector2())
                     {
                         JumpPos = new Vector2();
                         reCheckWard = true;
-                    }
+                    }                
                 }, 20);
             }
             if (m2M)
             {
                 Orbwalk(pos);
             }
-            if (!W.IsReady() || W.Name == "blindmonkwtwo" || reqinMaxRange && myHero.Distance(pos) > W.Range)
+            if (!W.IsReady() || WStage != WCastStage.First || reqinMaxRange && myHero.Distance(pos) > W.Range)
             {
                 return;
             }
@@ -1039,9 +1047,14 @@ namespace LeeSin
                 }
                 if (minions)
                 {
-                    var minion2 = (from minion in EntityManager.MinionsAndMonsters.GetLaneMinions(EntityManager.UnitTeam.Ally) where minion.IsAlly && minion.Distance(myHero) < W.Range && minion.Distance(pos) < 200 && !minion.Name.ToLower().Contains("ward") select minion).ToList();
+                    var minion2 = (from minion in ObjectManager.Get<Obj_AI_Minion>() where minion.IsAlly && minion.Distance(myHero) < W.Range && minion.Distance(pos) < 200 && !minion.Name.ToLower().Contains("ward") select minion).ToList();
                     if (minion2.Count > 0 && WStage == WCastStage.First)
                     {
+                        if (500 >= Environment.TickCount - wcasttime || WStage != WCastStage.First)
+                        {
+                            return;
+                        }
+
                         CastW(minion2[0]);
                         return;
                     }
@@ -1054,7 +1067,7 @@ namespace LeeSin
                 if (ward.IsAlly && ward.Name.ToLower().Contains("ward") && ward.Distance(JumpPos) < 200)
                 {
                     isWard = true;
-                    if (500 >= Environment.TickCount - wcasttime || WStage != WCastStage.First) //credits to JackisBack
+                    if (500 >= Environment.TickCount - wcasttime || WStage != WCastStage.First)
                     {
                         return;
                     }
@@ -1066,22 +1079,28 @@ namespace LeeSin
 
             if (!isWard && castWardAgain)
             {
-                var ward = FindBestWardItem();
-                if (ward == null || WStage != WCastStage.First)
+                if (Game.Time - LastWard >= 3)
                 {
-                    return;
+                    var ward = FindBestWardItem();
+                    if (ward != null || WStage != WCastStage.First)
+                    {
+                        if (ward != null)
+                        {
+                            myHero.Spellbook.CastSpell(ward.SpellSlot, JumpPos.To3D());
+                        }
+
+                        lastWardPos = JumpPos.To3D();
+                        LastWard = (int)Game.Time;
+                    }
                 }
-
-                myHero.Spellbook.CastSpell(ward.SpellSlot, JumpPos.To3D());
-
-                lastWardPos = JumpPos.To3D();
-                LastWard = Environment.TickCount;
             }
         }
+
         private static void WardjumpToMouse()
         {
             WardJump(Game.CursorPos, ElLeeSinWardjumpMouse, ElLeeSinWardjumpMaxRange, false, ElLeeSinWardjumpMinions, ElLeeSinWardjumpChampions);
         }
+
         private static void CastQ(AIHeroClient target, bool smiteQ = false)
         {
             if (!Q.IsReady() || !target.IsValidTarget(Q.Range))
