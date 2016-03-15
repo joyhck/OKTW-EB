@@ -492,6 +492,18 @@ namespace Vayne
                 {
                     Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : OKTW");
                 }
+                else if (EModeStringList == 12)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Shine - Hikicarry");
+                }
+                else if (EModeStringList == 13)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Asuna - Hikicarry");
+                }
+                else if (EModeStringList == 14)
+                {
+                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : 360 - Hikicarry");
+                }
             }
 
             if (DrawWStacksBool)
@@ -1576,8 +1588,9 @@ namespace Vayne
             CondemnSettings.AddLabel("1 : Prada Smart | 2 : Prada Perfect | 3 : Marksman");
             CondemnSettings.AddLabel("4 : Sharpshooter | 5 : Gosu | 6 : VHR");
             CondemnSettings.AddLabel("7 : Prada Legacy | 8 : Fastest | 9 : Old Prada");
-            CondemnSettings.AddLabel("10 : Synx Auto Carry | 11 : OKTW");
-            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 11)); // EModeStringList
+            CondemnSettings.AddLabel("10 : Synx Auto Carry | 11 : OKTW | 12 : Shine - HikiCarry");
+            CondemnSettings.AddLabel("13 : Asuna - Hikicarry | 14 : 360 - Hikicarry");
+            CondemnSettings.Add("emode", new Slider("E Mode: ", 2, 1, 14)); // EModeStringList
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("onlyCondemnTarget", new CheckBox("Only Condemn Current Target", false)); // UseEInterruptBool
             CondemnSettings.Add("useeinterrupt", new CheckBox("Use E To Interrupt")); // UseEInterruptBool
@@ -1858,7 +1871,119 @@ namespace Vayne
                 }
             }
 
+            if (mode == 12) // Shine
+            {
+                foreach (var a in EntityManager.Heroes.Enemies.Where(h => h.IsValidTarget(E.Range)))
+                {
+                    if (onlyCondemnTarget)
+                    {
+                        if (a.NetworkId != target.NetworkId)
+                        {
+                            return false;
+                        }
+                    }
+                    var pushDistance = EPushDistanceSlider;
+                    var targetPosition = E2.GetPrediction(a).UnitPosition;
+                    var pushDirection = (targetPosition - ObjectManager.Player.ServerPosition).Normalized();
+                    float checkDistance = pushDistance / 40f;
+                    for (int i = 0; i < 40; i++)
+                    {
+                        Vector3 finalPosition = targetPosition + (pushDirection * checkDistance * i);
+                        var collFlags = NavMesh.GetCollisionFlags(finalPosition);
+                        if (collFlags.HasFlag(CollisionFlags.Wall) || collFlags.HasFlag(CollisionFlags.Building)) //not sure about building, I think its turrets, nexus etc
+                        {
+                            return true;
+                        }
+                    }
+
+                }
+            }
+
+            if (mode == 13) // Asuna
+            {
+                foreach (var En in EntityManager.Heroes.Enemies.Where(b => b.IsValidTarget(E.Range) && !b.HasBuffOfType(BuffType.SpellShield) && !b.HasBuffOfType(BuffType.SpellImmunity)))
+                {
+                    if (onlyCondemnTarget)
+                    {
+                        if (En.NetworkId != target.NetworkId)
+                        {
+                            return false;
+                        }
+                    }
+                    var EPred = E2.GetPrediction(En);
+                    int pushDist = EPushDistanceSlider;
+                    var FinalPosition = EPred.UnitPosition.To2D().Extend(ObjectManager.Player.ServerPosition.To2D(), -pushDist).To3D();
+
+                    for (int i = 1; i < pushDist; i += (int)En.BoundingRadius)
+                    {
+                        Vector3 loc3 = EPred.UnitPosition.To2D().Extend(ObjectManager.Player.ServerPosition.To2D(), -i).To3D();
+
+                        if (loc3.IsWall() || AsunasAllyFountain(FinalPosition))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (mode == 14) // 360
+            {
+                foreach (var enemy in EntityManager.Heroes.Enemies.Where(x => x.IsValidTarget(E.Range) && !x.HasBuffOfType(BuffType.SpellShield) && !x.HasBuffOfType(BuffType.SpellImmunity) && threeSixty(x)))
+                {
+                    if (onlyCondemnTarget)
+                    {
+                        if (enemy.NetworkId != target.NetworkId)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
             return false;
+        }
+
+        public static List<Vector2> Points = new List<Vector2>();
+
+        public static bool threeSixty(AIHeroClient unit, Vector2 pos = new Vector2())
+        {
+            if (unit.HasBuffOfType(BuffType.SpellImmunity) || unit.HasBuffOfType(BuffType.SpellShield) || ObjectManager.Player.IsDashing()) return false;
+            var prediction = E2.GetPrediction(unit);
+            var predictionsList = pos.IsValid() ? new List<Vector3>() { pos.To3D() } : new List<Vector3> { unit.ServerPosition, unit.Position, prediction.CastPosition, prediction.UnitPosition };
+
+            var wallsFound = 0;
+            Points = new List<Vector2>();
+            foreach (var position in predictionsList)
+            {
+                for (var i = 0; i < EPushDistanceSlider; i += (int)unit.BoundingRadius) // 420 = push distance
+                {
+                    var cPos = ObjectManager.Player.Position.Extend((Vector3)position, (ObjectManager.Player.Distance(position) + i)).To3D();
+                    Points.Add(cPos.To2D());
+                    if (NavMesh.GetCollisionFlags(cPos).HasFlag(CollisionFlags.Wall) || NavMesh.GetCollisionFlags(cPos).HasFlag(CollisionFlags.Building))
+                    {
+                        wallsFound++;
+                        break;
+                    }
+                }
+            }
+            if ((wallsFound / predictionsList.Count) >= 33 / 100f)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool AsunasAllyFountain(Vector3 position)
+        {
+            float fountainRange = 750;
+            var map = Game.MapId;
+            if (map != null && Game.MapId == GameMapId.SummonersRift)
+            {
+                fountainRange = 1050;
+            }
+            return ObjectManager.Get<GameObject>().Where(spawnPoint => spawnPoint is Obj_SpawnPoint && spawnPoint.IsAlly).Any(spawnPoint => Vector2.Distance(position.To2D(), spawnPoint.Position.To2D()) < fountainRange);
         }
 
         public static bool IsValidTarget(AIHeroClient target)
