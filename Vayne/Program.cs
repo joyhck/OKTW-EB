@@ -266,24 +266,6 @@ namespace Vayne
                     }
                 }
             }
-
-            if (SemiAutomaticCondemnKey)
-            {
-                foreach (var hero in EntityManager.Heroes.Enemies.Where(h => h.ServerPosition.Distance(myHero.ServerPosition) < 550))
-                {
-                    var prediction = E2.GetPrediction(hero);
-                    Vector2 a = prediction.UnitPosition.To2D();
-                    for (var i = 40; i < 425; i += 125)
-                    {
-                        var flags = NavMesh.GetCollisionFlags(a.Extend(myHero.ServerPosition, (float)-i));
-                        if (flags.HasFlag(CollisionFlags.Wall) || flags.HasFlag(CollisionFlags.Building))
-                        {
-                            E.Cast(hero);
-                            return;
-                        }
-                    }
-                }
-            }
         }
 
         static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
@@ -420,22 +402,13 @@ namespace Vayne
                     Drawing.DrawText(x, y, Color.DarkGray, "Use R Auto? : " + UseRBool);
                 }
 
-                if (SemiAutomaticCondemnKey)
-                {
-                    Drawing.DrawText(x, y + 25, Color.DeepSkyBlue, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
-                }
-                else
-                {
-                    Drawing.DrawText(x, y + 25, Color.DarkGray, "Semi Auto E On? : " + SemiAutomaticCondemnKey);
-                }
-
                 if (dontaa)
                 {
-                    Drawing.DrawText(x, y + 50, Color.DeepSkyBlue, "Don't AA in R? : " + dontaa);
+                    Drawing.DrawText(x, y + 25, Color.DeepSkyBlue, "Don't AA in R? : " + dontaa);
                 }
                 else
                 {
-                    Drawing.DrawText(x, y + 50, Color.DarkGray, "Don't AA in R? : " + dontaa);
+                    Drawing.DrawText(x, y + 25, Color.DarkGray, "Don't AA in R? : " + dontaa);
                 }
             }
 
@@ -444,96 +417,96 @@ namespace Vayne
 
                 if (QModeStringList == 1)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Prada");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Prada");
                 }
                 else if (QModeStringList == 2)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Marksman");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Marksman");
                 }
                 else if (QModeStringList == 3)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : VHR/SOLO");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : VHR/SOLO");
                 }
                 else if (QModeStringList == 4)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Sharpshooter");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Sharpshooter");
                 }
                 else if (QModeStringList == 5)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Synx Auto Carry");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Synx Auto Carry");
                 }
                 else if (QModeStringList == 6)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : To Cursor");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : To Cursor");
                 }
                 else if (QModeStringList == 7)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kite Melee");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Kite Melee");
                 }
                 else if (QModeStringList == 8)
                 {
-                    Drawing.DrawText(x, y + 75, Color.Red, "Current Q Logic : Kurisu");
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Kurisu");
                 }
 
                 if (EModeStringList == 1)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Smart");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Prada Smart");
                 }
                 else if (EModeStringList == 2)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Perfect");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Prada Perfect");
                 }
                 else if (EModeStringList == 3)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Marksman");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Marksman");
                 }
                 else if (EModeStringList == 4)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Sharpshooter");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Sharpshooter");
                 }
                 else if (EModeStringList == 5)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Gosu");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Gosu");
                 }
                 else if (EModeStringList == 6)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : VHR");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : VHR");
                 }
                 else if (EModeStringList == 7)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Prada Legacy");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Prada Legacy");
                 }
                 else if (EModeStringList == 8)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Fastest");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Fastest");
                 }
                 else if (EModeStringList == 9)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Old Prada");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Old Prada");
                 }
                 else if (EModeStringList == 10)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Synx Auto Carry");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Synx Auto Carry");
                 }
                 else if (EModeStringList == 11)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : OKTW");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : OKTW");
                 }
                 else if (EModeStringList == 12)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Shine - Hikicarry");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Shine - Hikicarry");
                 }
                 else if (EModeStringList == 13)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : Asuna - Hikicarry");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : Asuna - Hikicarry");
                 }
                 else if (EModeStringList == 14)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : 360 - Hikicarry");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : 360 - Hikicarry");
                 }
                 else if (EModeStringList == 15)
                 {
-                    Drawing.DrawText(x, y + 100, Color.Red, "Current E Logic : SergixCondemn");
+                    Drawing.DrawText(x, y + 75, Color.Red, "Current E Logic : SergixCondemn");
                 }
             }
 
@@ -1509,7 +1482,6 @@ namespace Vayne
         public static bool UseEAntiGapcloserBool { get { return CondemnSettings["useeantigapcloser"].Cast<CheckBox>().CurrentValue; } }
         public static int EPushDistanceSlider { get { return CondemnSettings["epushdist"].Cast<Slider>().CurrentValue; } }
         public static int EHitchanceSlider { get { return CondemnSettings["ehitchance"].Cast<Slider>().CurrentValue; } }
-        public static bool SemiAutomaticCondemnKey { get { return CondemnSettings["semiautoekey"].Cast<KeyBind>().CurrentValue; } }
         public static bool UseEAs3rdWProcBool { get { return ExtraMenu["usee3rdwproc"].Cast<CheckBox>().CurrentValue; } }
         public static bool UseQBonusOnEnemiesNotCS { get { return ExtraMenu["useqonenemiesnotcs"].Cast<CheckBox>().CurrentValue; } }
         public static bool UseQOnlyAt2WStacksBool { get { return ExtraMenu["useqonlyon2stackedenemies"].Cast<CheckBox>().CurrentValue; } }
@@ -1648,8 +1620,6 @@ namespace Vayne
             CondemnSettings.Add("epushdist", new Slider("E Push Distance: ", 425, 300, 475)); // EPushDistanceSlider
             CondemnSettings.AddSeparator();
             CondemnSettings.Add("ehitchance", new Slider("Condemn Hitchance", 75, 0, 100)); // EHitchanceSlider
-            CondemnSettings.AddSeparator();
-            CondemnSettings.Add("semiautoekey", new KeyBind("Semi Automatic Condemn", false, KeyBind.BindTypes.PressToggle, 'E')); // SemiAutomaticCondemnKey
             CondemnSettings.AddSeparator();
 
             ESettings = Menu.AddSubMenu("E Settings", "esettings");
