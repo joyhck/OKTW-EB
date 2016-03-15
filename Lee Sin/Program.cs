@@ -248,7 +248,7 @@ namespace LeeSin
             Menu.Add("bonusRangeA", new Slider("Ally Bonus Range", 0, 0, 1000));
             Menu.AddSeparator();
 
-            Q = new Spell.Skillshot(SpellSlot.Q, 1075, SkillShotType.Linear, 250, 1800, 60);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1020, SkillShotType.Linear, 250, 1800, 50);
             Q2 = new Spell.Active(SpellSlot.Q, 1300);
             W = new Spell.Targeted(SpellSlot.W, 700);
             W2 = new Spell.Active(SpellSlot.W);
