@@ -17,7 +17,7 @@ namespace Vayne
         #region Instance Variables
         private static Spell.Skillshot Q, E2;
         private static Spell.Targeted E;
-        private static Spell.Active W, R, cleanse;
+        private static Spell.Active W, R, cleanse, heal;
         #endregion
 
         #region Init
@@ -42,10 +42,18 @@ namespace Vayne
             E2 = new Spell.Skillshot(SpellSlot.E, 550, SkillShotType.Linear, (int)0.42f, 1300, 50);
 
             var clean = Player.Spells.FirstOrDefault(o => o.SData.Name == "SummonerBoost");
+            var h = Player.Spells.FirstOrDefault(o => o.SData.Name == "summonerheal");
+
             if (clean != null)
             {
                 SpellSlot cleanses = EloBuddy.SDK.Extensions.GetSpellSlotFromName(myHero, "SummonerBoost");
                 cleanse = new Spell.Active(cleanses);
+            }
+
+            if (h != null)
+            {
+                SpellSlot he = EloBuddy.SDK.Extensions.GetSpellSlotFromName(myHero, "summonerheal");
+                heal = new Spell.Active(he);
             }
 
             InitMenu();
@@ -66,49 +74,40 @@ namespace Vayne
             {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Quicksilver_Sash); }, CSSDelay);
             }
-            else if (Item.CanUseItem(ItemId.Mercurial_Scimitar))
+            if (Item.CanUseItem(ItemId.Mercurial_Scimitar))
             {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Mercurial_Scimitar); }, CSSDelay);
             }
-            else if (Item.CanUseItem(ItemId.Dervish_Blade))
+            if (Item.CanUseItem(ItemId.Dervish_Blade))
             {
                 Core.DelayAction(delegate { Item.UseItem(ItemId.Dervish_Blade); }, CSSDelay);
             }
-            else if (cleanse != null && cleanse.IsReady())
+            if (cleanse != null)
             {
-                Core.DelayAction(delegate { cleanse.Cast(); }, CSSDelay);
+                if (cleanse.IsReady())
+                {
+                    Core.DelayAction(delegate { cleanse.Cast(); }, CSSDelay);
+                }
             }
         }
 
         private static void Cleansers()
         {
-            if (!_Clean)
+            if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade) && (cleanse == null || !cleanse.IsReady()))
             {
                 return;
             }
 
-            var target = TargetSelector.GetTarget(550, DamageType.Physical);
-
-            if (target == null) { return; }
-
-            if (!Item.CanUseItem(ItemId.Quicksilver_Sash) && !Item.CanUseItem(ItemId.Mikaels_Crucible) && !Item.CanUseItem(ItemId.Mercurial_Scimitar) && !Item.CanUseItem(ItemId.Dervish_Blade))
+            if (myHero.HealthPercent >= cleanHP || !_Clean)
             {
                 return;
             }
 
-            if (!Item.HasItem(ItemId.Quicksilver_Sash) && !Item.HasItem(ItemId.Mikaels_Crucible) && !Item.HasItem(ItemId.Mercurial_Scimitar) && !Item.HasItem(ItemId.Dervish_Blade))
-            {
-                return;
-            }
-
-            if (myHero.HealthPercent >= cleanHP)
-            {
-                return;
-            }
+            Console.WriteLine("past checks");
 
             if (CleanSpells)
             {
-                if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague"))
+                if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague") || myHero.HasBuff("zedulttargetmark") || myHero.HasBuff("AlZaharNetherGrasp"))
                 {
                     Clean();
                 }
@@ -141,21 +140,41 @@ namespace Vayne
             }
 
             if (myHero.HasBuffOfType(BuffType.Stun) && Stun)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Snare) && Snare)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Charm) && Charm)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Fear) && Fear)
+            {
                 Clean();
+            }
+            if ((myHero.HasBuffOfType(BuffType.Fear) || (myHero.HasBuffOfType(BuffType.Flee) && myHero.HasBuff("nocturefleeslow"))) && Fear)
+            {
+                Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Stun) && Stun)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Taunt) && Taunt)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Suppression) && Suppression)
+            {
                 Clean();
+            }
             if (myHero.HasBuffOfType(BuffType.Blind) && Blind)
+            {
                 Clean();
+            }
         }
 
         public static void OnUpdate(EventArgs args)
@@ -168,6 +187,14 @@ namespace Vayne
                 {
                     var mostDangerous = meleeEnemies.OrderByDescending(m => m.GetAutoAttackDamage(ObjectManager.Player)).First();
                     E.Cast(mostDangerous);
+                }
+            }
+
+            if (useHeal)
+            {
+                if (myHero.HealthPercent <= lowerHeal && (myHero.CountEnemiesInRange(400) >= 1 || myHero.HasBuff("summonerdot")))
+                {
+                    heal.Cast();
                 }
             }
 
@@ -545,7 +572,17 @@ namespace Vayne
             {
                 if (dontaa)
                 {
-                    args.Process = false;
+                    if (dontaaslider)
+                    {
+                        if (myHero.CountEnemiesInRange(750) >= dontaaenemy)
+                        {
+                            args.Process = false;
+                        }
+                    }
+                    else
+                    {
+                        args.Process = false;
+                    }
                 }
 
                 if (EntityManager.Heroes.Enemies.Any(e => e.ServerPosition.Distance(myHero.ServerPosition) < 350 && e.IsMelee) && DontAttackWhileInvisibleAndMeelesNearBool)
@@ -1519,6 +1556,12 @@ namespace Vayne
         public static bool onlyCondemnTarget { get { return CondemnSettings["onlyCondemnTarget"].Cast<CheckBox>().CurrentValue; } }
         public static bool lowlifepeel { get { return ComboMenu["lowlifepeel"].Cast<CheckBox>().CurrentValue; } }
 
+        public static bool dontaaslider { get { return ComboMenu["dontaaslider"].Cast<CheckBox>().CurrentValue; } }
+        public static int dontaaenemy { get { return ComboMenu["dontaaenemy"].Cast<Slider>().CurrentValue; } }
+
+        public static bool useHeal { get { return ItemMenu["useHeal"].Cast<CheckBox>().CurrentValue; } }
+        public static int lowerHeal { get { return ItemMenu["lowerHeal"].Cast<Slider>().CurrentValue; } }
+
         #endregion
 
         #region Menu
@@ -1546,6 +1589,8 @@ namespace Vayne
             ComboMenu.Add("qantigc", new Slider("Use Q Antigapcloser:", 3, 1, 3)); // UseQAntiGapcloserStringList
             ComboMenu.AddSeparator();
             ComboMenu.Add("dontaa", new KeyBind("Don't Auto Attack in R", false, KeyBind.BindTypes.PressToggle, 'T'));
+            ComboMenu.Add("dontaaslider", new CheckBox("^ Only use if greater than X # of enemies?"));
+            ComboMenu.Add("dontaaenemy", new Slider("^ # of enemies", 3, 1, 5));
             ComboMenu.AddSeparator();
 
             QSettings = Menu.AddSubMenu("Q Settings", "qsettings");
@@ -1641,6 +1686,9 @@ namespace Vayne
             ExtraMenu.AddSeparator();
 
             ItemMenu = Menu.AddSubMenu("Activator", "item");
+            ItemMenu.Add("useHeal", new CheckBox("Use Heal?"));
+            ItemMenu.Add("lowerHeal", new Slider("Lower than X HP to heal :", 15, 0, 100));
+            ItemMenu.AddSeparator();
             ItemMenu.Add("useBotrk", new CheckBox("Use Blade of the Ruined King?"));
             ItemMenu.Add("useCutlass", new CheckBox("Use Bilgewater Cutlass?"));
             ItemMenu.Add("useGhostBlade", new CheckBox("Use GhostBlade?"));
@@ -1649,12 +1697,12 @@ namespace Vayne
             ItemMenu.AddSeparator();
             ItemMenu.Add("CSSDelay", new Slider("QSS Delay", 0, 0, 1000)); // CSSDelay
             ItemMenu.AddSeparator();
-            foreach (var ally in ObjectManager.Get<AIHeroClient>().Where(ally => ally.IsAlly))
+            foreach (var ally in ObjectManager.Get<AIHeroClient>().Where(ally => ally.IsAlly && !ally.IsMe))
             {
                 ItemMenu.Add("MikaelsAlly" + ally.ChampionName, new CheckBox("Mikael : " + ally.ChampionName + "?"));
             }
             ItemMenu.AddSeparator();
-            ItemMenu.Add("cleanHP", new Slider("Use only under % HP", 95, 0, 100));  // cleanHP
+            ItemMenu.Add("cleanHP", new Slider("Use only under % HP (101 : Forever)", 95, 0, 101));  // cleanHP
             ItemMenu.AddSeparator();
             ItemMenu.Add("CleanSpells", new CheckBox("Cleanse Dangerous (Zed R etc.)"));
             ItemMenu.Add("Stun", new CheckBox("Stun"));
@@ -2373,6 +2421,7 @@ namespace Vayne
         #endregion
     }
 
+    #region VHRPolygon
     class VHRPolygon
     {
         public List<Vector2> Points;
@@ -2424,4 +2473,5 @@ namespace Vayne
             return points;
         }
     }
+    #endregion
 }
