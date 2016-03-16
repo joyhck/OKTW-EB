@@ -105,8 +105,8 @@
     <Compile Include="SOLOVayne.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WardTracker.cs\WardDetector.cs" />
-    <Compile Include="WardTracker.cs\WardTrackerVariables.cs" />
+    <Compile Include="WardTracker\WardDetector.cs" />
+    <Compile Include="WardTracker\WardTrackerVariables.cs" />
     <Compile Include="YasuoWall.cs" />
   </ItemGroup>
   <ItemGroup>
