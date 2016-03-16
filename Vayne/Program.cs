@@ -9,6 +9,7 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using Color = System.Drawing.Color;
+using LS = LeagueSharp.Common;
 
 namespace Vayne
 {
@@ -1539,6 +1540,7 @@ namespace Vayne
         #region Menu
 
         private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu, ItemMenu;
+
 
         private static void InitMenu()
         {
