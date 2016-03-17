@@ -39,6 +39,12 @@ namespace Vayne
         #region ctor
         private static void OnLoad(EventArgs args)
         {
+
+            if (myHero.ChampionName != Champion.Vayne.ToString()) {
+                Chat.Print("[Berb] : You are not playing Vayne, this addon will not load.");
+                return;
+            }
+
             Q = new Spell.Skillshot(SpellSlot.Q, 300, SkillShotType.Linear);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Targeted(SpellSlot.E, 550);
@@ -210,6 +216,12 @@ namespace Vayne
 
         public static void OnUpdate(EventArgs args)
         {
+
+            if (_autoLevel) 
+            {
+                AutoLevel._AutoSpell();
+            }
+
             if (lowlifepeel && E.IsReady() && !Q.IsReady() && (ObjectManager.Player.HealthPercent <= 25))
             {
                 var meleeEnemies = EntityManager.Heroes.Enemies.Where(m => m.Distance(ObjectManager.Player, true) <= 400 && m.IsMelee);
@@ -1337,6 +1349,9 @@ namespace Vayne
         public static bool useHeal { get { return ItemMenu["useHeal"].Cast<CheckBox>().CurrentValue; } }
         public static int lowerHeal { get { return ItemMenu["lowerHeal"].Cast<Slider>().CurrentValue; } }
 
+        public static bool _autoLevel { get { return ExtraMenu["autoLevel"].Cast<CheckBox>().CurrentValue; } }
+
+
         #endregion
 
         #region Menu
@@ -1479,7 +1494,8 @@ namespace Vayne
             ExtraMenu = Menu.AddSubMenu("Extra Settings", "extra");
             ExtraMenu.AddGroupLabel("Extra Settings");
             ExtraMenu.AddSeparator();
-            ExtraMenu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc Before LVL: ", false)); // UseEAs3rdWProcBool
+            ExtraMenu.Add("autoLevel", new CheckBox("Auto Level", false));
+            ExtraMenu.Add("usee3rdwproc", new CheckBox("Use E as 3rd W Proc", false)); // UseEAs3rdWProcBool
             ExtraMenu.Add("useqonenemiesnotcs", new CheckBox("Use Q Bonus On ENEMY not CS", false)); // UseQBonusOnEnemiesNotCS
             ExtraMenu.Add("useqonlyon2stackedenemies", new CheckBox("Use Q If Enemy Have 2W Stacks", false)); // UseQOnlyAt2WStacksBool
             ExtraMenu.AddSeparator();

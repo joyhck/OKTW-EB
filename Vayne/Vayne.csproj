@@ -75,6 +75,7 @@
     <Compile Include="SOLOVayne\Tumble\TumbleHelper.cs" />
     <Compile Include="SOLOVayne\Tumble\TumbleLogicProvider.cs" />
     <Compile Include="SOLOVayne\Tumble\TumbleVariables.cs" />
+    <Compile Include="Utility\AutoLevel.cs" />
     <Compile Include="Utility\Evadespells\EvadeSpellData.cs" />
     <Compile Include="Utility\Evadespells\EvadeSpellDatabase.cs" />
     <Compile Include="Utility\Geometry.cs" />
