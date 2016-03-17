@@ -76,6 +76,7 @@ namespace Vayne
             CustomAntigapcloser.OnEnemyGapcloser += CustomAntigapcloser_OnEnemyGapcloser;
             GameObject.OnCreate += GameObject_OnCreate;
         }
+
         #endregion
 
         #region Events
@@ -220,6 +221,15 @@ namespace Vayne
             if (_autoLevel) 
             {
                 AutoLevel._AutoSpell();
+            }
+
+            if (UseEAntiGapcloserBool && E.IsReady()) 
+            {
+                var getTrist = EntityManager.Heroes.Enemies.Where(x => x.ChampionName == Champion.Tristana.ToString() && x.HasBuff("TristanaW") && x.IsValidTarget(E.Range));
+                if (getTrist.Any() && GPSub[string.Format("dz191.vhr.agplist.{0}.{1}", "tristana", "rocketjump")].Cast<CheckBox>().CurrentValue)
+                {
+                    E.Cast(getTrist.FirstOrDefault());
+                }
             }
 
             if (lowlifepeel && E.IsReady() && !Q.IsReady() && (ObjectManager.Player.HealthPercent <= 25))
