@@ -73,7 +73,6 @@ namespace Vayne
         #endregion
 
         #region Events
-
         private static void GameObject_OnCreate(GameObject sender, EventArgs args)
         {
             if (UseEAntiGapcloserBool && E.IsReady())
@@ -93,7 +92,7 @@ namespace Vayne
         {
             if (UseEAntiGapcloserBool && E.IsReady())
             {
-                if (gapcloser.Sender.IsValidTarget(E.Range) && gapcloser.End.Distance(ObjectManager.Player.ServerPosition) <= 1f && GPSub[string.Format("dz191.vhr.agplist.{0}.{1}", gapcloser.Sender.ChampionName.ToLowerInvariant(), gapcloser.SpellName)].Cast<CheckBox>().CurrentValue)
+                if (gapcloser.Sender.IsValidTarget(E.Range) && gapcloser.End.Distance(ObjectManager.Player.ServerPosition) <= 400f && GPSub[string.Format("dz191.vhr.agplist.{0}.{1}", gapcloser.Sender.ChampionName.ToLowerInvariant(), gapcloser.SpellName)].Cast<CheckBox>().CurrentValue)
                 {
                     E.Cast(gapcloser.Sender);
                 }
@@ -503,6 +502,10 @@ namespace Vayne
                 {
                     Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Kurisu");
                 }
+                else if (QModeStringList == 9)
+                {
+                    Drawing.DrawText(x, y + 50, Color.Red, "Current Q Logic : Safe Position");
+                }
 
                 if (EModeStringList == 1)
                 {
@@ -800,18 +803,21 @@ namespace Vayne
                                     }
                                 }
                                 break;
+                            case 9:
+                                SafePositionQ(tg);
+                                break;
                             default:
                                 tumblePosition = Game.CursorPos;
                                 break;
                         }
                         if ((tumblePosition.Distance(myHero.Position) > 2000 || IsDangerousPosition(tumblePosition)))
                         {
-                            if (mode != 3 || mode != 6 || mode != 7 || mode != 8)
+                            if (mode != 3 || mode != 6 || mode != 7 || mode != 8 || mode != 9)
                             {
                                 return;
                             }
                         }
-                        if (mode != 3 || mode != 6 || mode != 7 || mode != 8 || mode != 4)
+                        if (mode != 3 || mode != 6 || mode != 7 || mode != 8 || mode != 4 || mode != 9)
                         {
                             myHero.Spellbook.CastSpell(SpellSlot.Q, tumblePosition);
                         }
@@ -850,6 +856,38 @@ namespace Vayne
             if (UseQOnlyAt2WStacksBool && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && possible2WTarget.IsValidTarget())
             {
                 myHero.Spellbook.CastSpell(SpellSlot.Q, GetTumblePos(possible2WTarget));
+            }
+        }
+
+        public static void SafePositionQ(AIHeroClient enemy)
+        {
+            var range = LS.Orbwalking.GetRealAutoAttackRange(enemy);
+            var path = LeagueSharp.Common.Geometry.CircleCircleIntersection(ObjectManager.Player.ServerPosition.To2D(), LS.Prediction.GetPrediction(enemy, 0.25f).UnitPosition.To2D(), Q.Range, range);
+
+            if (path.Count() > 0)
+            {
+                var epos = path.MinOrDefault(x => x.Distance(Game.CursorPos));
+                if (epos.To3D().UnderTurret(true) || epos.To3D().IsWall())
+                {
+                    return;
+                }
+
+                if (epos.To3D().CountEnemiesInRange(Q.Range - 100) > 0)
+                {
+                    return;
+                }
+                myHero.Spellbook.CastSpell(SpellSlot.Q, epos.To3D());
+            }
+            if (path.Count() == 0)
+            {
+                var epos = ObjectManager.Player.ServerPosition.Extend(enemy.ServerPosition, -Q.Range).To3D();
+                if (epos.UnderTurret(true) || epos.IsWall())
+                {
+                    return;
+                }
+
+                // no intersection or target to close
+                myHero.Spellbook.CastSpell(SpellSlot.Q, ObjectManager.Player.ServerPosition.Extend(enemy.ServerPosition, -Q.Range).To3D());
             }
         }
 
@@ -1360,8 +1398,8 @@ namespace Vayne
             QSettings.AddGroupLabel("Q Settings");
             QSettings.AddSeparator();
             QSettings.AddLabel("1 : Prada | 2 : Marksman | 3 : VHR/SOLO | 4 : Sharpshooter | 5 : SAC");
-            QSettings.AddLabel("6 : Cursor | 7 : Kite Melee | 8 : Kurisu");
-            QSettings.Add("qmode", new Slider("Q Mode:", 5, 1, 8)); // QModeStringList
+            QSettings.AddLabel("6 : Cursor | 7 : Kite Melee | 8 : Kurisu | 9 : Safe Position - HikiGaya");
+            QSettings.Add("qmode", new Slider("Q Mode:", 5, 1, 9)); // QModeStringList
             QSettings.AddSeparator();
             QSettings.AddGroupLabel("VHR/SOLOVayne Q Settings");
             QSettings.AddLabel("YOU HAVE TO HAVE OPTION 3 SELECTED TO USE THIS");
