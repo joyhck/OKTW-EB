@@ -1380,12 +1380,11 @@ namespace Vayne
                     {
                         continue;
                     }
+                    GPSub = GPMenu.AddSubMenu(string.Format("{0}", champ));
                 }
 
                 foreach (var gp in CustomAntigapcloser.Spells.Where(h => enemyHeroesNames.Contains(h.ChampionName)))
                 {
-                    GPSub = GPMenu.AddSubMenu(string.Format("{0}", gp.ChampionName.ToUpperInvariant()));
-
                     GPSub.Add(string.Format("dz191.vhr.agplist.{0}.{1}", gp.ChampionName.ToLowerInvariant(), gp.SpellName), new CheckBox(gp.ChampionName + " " + gp.Slot + " (" + gp.SpellName + ")", true));
                 }
             }
