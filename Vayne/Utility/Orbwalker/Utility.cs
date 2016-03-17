@@ -69,7 +69,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Returns if the target is valid (not dead, targetable, visible...).
         /// </summary>
-        public static bool IsValidTarget(this AttackableUnit unit,
+        public static bool LSIsValidTarget(this AttackableUnit unit,
             float range = float.MaxValue,
             bool checkTeam = true,
             Vector3 from = new Vector3())
@@ -279,7 +279,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Checks if this position is a wall using NavMesh
         /// </summary>
-        public static bool IsWall(this Vector3 position)
+        public static bool LSIsWall(this Vector3 position)
         {
             return NavMesh.GetCollisionFlags(position).HasFlag(CollisionFlags.Wall);
         }
@@ -506,8 +506,7 @@ namespace LeagueSharp.Common
 
         public static bool UnderTurret(this Vector3 position, bool enemyTurretsOnly)
         {
-            return
-                ObjectManager.Get<Obj_AI_Turret>().Any(turret => turret.IsValidTarget(950, enemyTurretsOnly, position));
+            return ObjectManager.Get<Obj_AI_Turret>().Any(turret => turret.IsValidTarget(950, enemyTurretsOnly, position));
         }
         /// <summary>
         ///  Return true if unit is under ally turret range.
@@ -528,13 +527,13 @@ namespace LeagueSharp.Common
         }
 
         [Obsolete("Use CountEnemiesInRange", false)]
-        public static int CountEnemysInRange(this Obj_AI_Base unit, float range)
+        public static int LSCountEnemysInRange(this Obj_AI_Base unit, float range)
         {
             return unit.ServerPosition.CountEnemiesInRange(range);
         }
 
         [Obsolete("Use CountEnemiesInRange", false)]
-        public static int CountEnemysInRange(this Vector3 point, float range)
+        public static int LSCountEnemysInRange(this Vector3 point, float range)
         {
             return point.CountEnemiesInRange(range);
         }
@@ -542,7 +541,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Counts the enemies in range of Player.
         /// </summary>
-        public static int CountEnemiesInRange(float range)
+        public static int LSCountEnemiesInRange(float range)
         {
             return HeroManager.Player.CountEnemiesInRange(range);
         }
@@ -550,7 +549,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Counts the enemies in range of Unit.
         /// </summary>
-        public static int CountEnemiesInRange(this Obj_AI_Base unit, float range)
+        public static int LSCountEnemiesInRange(this Obj_AI_Base unit, float range)
         {
             return unit.ServerPosition.CountEnemiesInRange(range);
         }
@@ -558,7 +557,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Counts the enemies in range of point.
         /// </summary>
-        public static int CountEnemiesInRange(this Vector3 point, float range)
+        public static int LSCountEnemiesInRange(this Vector3 point, float range)
         {
             return HeroManager.Enemies.Count(h => h.IsValidTarget(range, true, point));
         }

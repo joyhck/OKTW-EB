@@ -1395,7 +1395,7 @@ namespace LeagueSharp.Common
                 StoredPaths.Add(sender.NetworkId, new List<StoredPath>());
             }
 
-            var newPath = new StoredPath { Tick = Utils.TickCount, Path = args.Path.ToList().To2D() };
+            var newPath = new StoredPath { Tick = Utils.TickCount, Path = args.Path.ToList().LSTo2D() };
             StoredPaths[sender.NetworkId].Add(newPath);
 
             if (StoredPaths[sender.NetworkId].Count > 50)

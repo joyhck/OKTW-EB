@@ -554,7 +554,7 @@ namespace LeagueSharp.Common
 
             if (Player.Distance(point, true) < 150 * 150)
             {
-                point = playerPosition.Extend(
+                point = playerPosition.LSExtend(
                     position, randomizeMinDistance ? (_random.NextFloat(0.6f, 1) + 0.2f) * _minDistance : _minDistance);
             }
             var angle = 0f;

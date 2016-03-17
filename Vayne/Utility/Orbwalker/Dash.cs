@@ -71,7 +71,7 @@ namespace LeagueSharp.Common
                 if (args.IsDash)
                 {
                     var path = new List<Vector2> { sender.ServerPosition.To2D() };
-                    path.AddRange(args.Path.ToList().To2D());
+                    path.AddRange(args.Path.ToList().LSTo2D());
 
                     DetectedDashes[sender.NetworkId].StartTick = Utils.TickCount;
                     DetectedDashes[sender.NetworkId].Speed = args.Speed;

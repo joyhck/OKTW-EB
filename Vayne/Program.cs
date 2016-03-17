@@ -10,15 +10,18 @@ using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using Color = System.Drawing.Color;
 using LS = LeagueSharp.Common;
+using SV = SoloVayne.Skills.Tumble;
+using SOLOVayne.Utility.General;
+using SAutoCarry.Champions.Helpers;
 
 namespace Vayne
 {
     public static class Program
     {
         #region Instance Variables
-        private static Spell.Skillshot Q, E2;
-        private static Spell.Targeted E;
-        private static Spell.Active W, R, cleanse, heal;
+        public static Spell.Skillshot Q, E2;
+        public static Spell.Targeted E;
+        public static Spell.Active W, R, cleanse, heal;
         #endregion
 
         #region Init
@@ -64,10 +67,38 @@ namespace Vayne
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
+            CustomAntigapcloser.OnEnemyGapcloser += CustomAntigapcloser_OnEnemyGapcloser;
+            GameObject.OnCreate += GameObject_OnCreate;
         }
         #endregion
 
         #region Events
+
+        private static void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
+            if (UseEAntiGapcloserBool && E.IsReady())
+            {
+                if (sender.IsEnemy && sender.Name == "Rengar_LeapSound.troy")
+                {
+                    var rengarEntity = LS.HeroManager.Enemies.Find(h => h.ChampionName.Equals("Rengar") && h.IsValidTarget(E.Range));
+                    if (rengarEntity != null)
+                    {
+                        E.Cast(rengarEntity);
+                    }
+                }
+            }
+        }
+
+        private static void CustomAntigapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (UseEAntiGapcloserBool && E.IsReady())
+            {
+                if (gapcloser.Sender.IsValidTarget(E.Range) && gapcloser.End.Distance(ObjectManager.Player.ServerPosition) <= 1f && GPSub[string.Format("dz191.vhr.agplist.{0}.{1}", gapcloser.Sender.ChampionName.ToLowerInvariant(), gapcloser.SpellName)].Cast<CheckBox>().CurrentValue)
+                {
+                    E.Cast(gapcloser.Sender);
+                }
+            }
+        }
 
         private static void Clean()
         {
@@ -273,16 +304,44 @@ namespace Vayne
         {
             if (UseEInterruptBool)
             {
-                var possibleChannelingTarget = EntityManager.Heroes.Enemies.FirstOrDefault(a => a.ServerPosition.Distance(myHero.ServerPosition) < 550 && sender.IsValidTarget() && sender.IsEnemy && !sender.IsZombie);
-                if (possibleChannelingTarget.IsValidTarget())
+                if (e.DangerLevel == DangerLevel.High && sender.IsValidTarget(E.Range))
                 {
-                    E.Cast(possibleChannelingTarget);
+                    E.Cast(sender);
                 }
             }
         }
 
+        /// <summary>
+        ///     Returns the spell slot with the name.
+        /// </summary>
+        public static SpellSlot GetSpellSlot(this AIHeroClient unit, string name)
+        {
+            foreach (var spell in unit.Spellbook.Spells.Where(spell => String.Equals(spell.Name, name, StringComparison.CurrentCultureIgnoreCase)))
+            {
+                return spell.Slot;
+            }
+
+            return SpellSlot.Unknown;
+        }
+
         public static void OnProcessSpellCast(GameObject sender, GameObjectProcessSpellCastEventArgs args)
         {
+
+            if (sender is AIHeroClient)
+            {
+                var s2 = (AIHeroClient)sender;
+                if (s2.IsValidTarget() && s2.ChampionName == "Pantheon" && s2.GetSpellSlot(args.SData.Name) == SpellSlot.W)
+                {
+                    if (UseEAntiGapcloserBool && args.Target.IsMe && E.IsReady())
+                    {
+                        if (s2.IsValidTarget(E.Range))
+                        {
+                            E.Cast(s2);
+                        }
+                    }
+                }
+            }
+
             if (QModeStringList == 4)
             {
                 if (sender != null)
@@ -378,10 +437,6 @@ namespace Vayne
                                     }
                             }
                         }
-                    }
-                    if (UseEInterruptBool && !sdata.IsInvulnerability && myHero.Distance(sender) < 550)
-                    {
-                        E.Cast((AIHeroClient)sender);
                     }
                 }
             }
@@ -640,27 +695,20 @@ namespace Vayne
                                 Orbwalker.ForcedTarget = tg;
                                 break;
                             case 3: // VHR
-                                if (target is AIHeroClient)
+                                if (smartq)
                                 {
-                                    var targetHero = target as AIHeroClient;
-                                    if (targetHero.IsValidTarget())
+                                    var position = SV.TumbleLogicProvider.GetSOLOVayneQPosition();
+                                    if (position != Vector3.Zero)
                                     {
-                                        if (smartq)
-                                        {
-                                            var position = GetSOLOVayneQPosition();
-                                            if (position != Vector3.Zero)
-                                            {
-                                                CastTumble(position, targetHero);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            var position = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D();
-                                            if (position.IsSafe())
-                                            {
-                                                CastTumble(position, targetHero);
-                                            }
-                                        }
+                                        CastTumble(position, tg);
+                                    }
+                                }
+                                else
+                                {
+                                    var position = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D();
+                                    if (position.IsSafe())
+                                    {
+                                        CastTumble(position, tg);
                                     }
                                 }
                                 break;
@@ -673,7 +721,6 @@ namespace Vayne
                                         {
                                             if (ObjectManager.Player.Position.Extend(Game.CursorPos, 700).CountEnemiesInRange(700) <= 1)
                                             {
-                                                //tumblePosition = Game.CursorPos;
                                                 myHero.Spellbook.CastSpell(SpellSlot.Q, Game.CursorPos);
                                             }
                                         }
@@ -685,7 +732,7 @@ namespace Vayne
                                 {
                                     if (Q.IsReady())
                                     {
-                                        Vector3 pos = FindTumblePosition(target as AIHeroClient);
+                                        Vector3 pos = Tumble.FindTumblePosition(target as AIHeroClient);
 
                                         if (pos.IsValid())
                                         {
@@ -806,6 +853,33 @@ namespace Vayne
             }
         }
 
+        private static void CastTumble(Vector3 Position, Obj_AI_Base target)
+        {
+            var WallQPosition = SV.TumbleHelper.GetQBurstModePosition();
+            if (WallQPosition != null && ObjectManager.Player.ServerPosition.IsSafeEx() && !(ObjectManager.Player.ServerPosition.UnderTurret(true)))
+            {
+                var V3WallQ = (Vector3)WallQPosition;
+                CastQ(V3WallQ);
+                return;
+            }
+
+            var TumbleQEPosition = SV.TumbleLogicProvider.GetQEPosition();
+            if (TumbleQEPosition != Vector3.Zero)
+            {
+                CastQ(TumbleQEPosition);
+                return;
+            }
+
+            Orbwalker.ForcedTarget = target;
+
+            if (ObjectManager.Player.CountEnemiesInRange(1500f) >= 3)
+            {
+
+            }
+
+            CastQ(Position);
+        }
+
         public static T MinOrDefault<T, TR>(this IEnumerable<T> container, Func<T, TR> valuingFoo) where TR : IComparable
         {
             var enumerator = container.GetEnumerator();
@@ -867,6 +941,7 @@ namespace Vayne
                 return EntityManager.Heroes.Enemies.FindAll(m => m.IsMelee && m.Distance(ObjectManager.Player) <= GetRealAutoAttackRange(m, ObjectManager.Player) && (m.ServerPosition.To2D() + (m.BoundingRadius + 25f) * m.Direction.To2D().Perpendicular()).Distance(ObjectManager.Player.ServerPosition.To2D()) <= m.ServerPosition.Distance(ObjectManager.Player.ServerPosition) && m.IsValidTarget(Range, false));
             }
         }
+
         public static Vector3 GetSmartQPosition()
         {
             if (!Csmartq || !E.IsReady())
@@ -1059,80 +1134,6 @@ namespace Vayne
             return null;
         }
 
-        public static Vector3 GetQEPosition()
-        {
-            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) || !E.IsReady())
-            {
-                return Vector3.Zero;
-            }
-
-            var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
-            for (var i = 0f; i < 360f; i += 45)
-            {
-                var angleRad = DegreeToRadian(i);
-                var rotatedPosition = (ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad))).To3D();
-                if (GetTarget(rotatedPosition).IsValidTarget() && rotatedPosition.IsSafe())
-                {
-                    return rotatedPosition;
-                }
-            }
-
-            return Vector3.Zero;
-        }
-
-        public static Vector3[] GetWallQPositions(float Range)
-        {
-            Vector3[] vList =
-            {
-                (ObjectManager.Player.ServerPosition.To2D() + Range * ObjectManager.Player.Direction.To2D()).To3D(),
-                (ObjectManager.Player.ServerPosition.To2D() - Range * ObjectManager.Player.Direction.To2D()).To3D()
-            };
-
-            return vList;
-        }
-
-        public static Vector3? GetQBurstModePosition()
-        {
-            var positions = GetWallQPositions(70).ToList().OrderBy(pos => pos.Distance(ObjectManager.Player.ServerPosition, true));
-
-            foreach (var position in positions)
-            {
-                if (position.IsWall() && position.IsSafe())
-                {
-                    return position;
-                }
-            }
-
-            return null;
-        }
-
-        private static void CastTumble(Vector3 Position, Obj_AI_Base target)
-        {
-            var WallQPosition = GetQBurstModePosition();
-            if (WallQPosition != null && ObjectManager.Player.ServerPosition.IsSafeEx() && !(ObjectManager.Player.ServerPosition.UnderTurret(true)))
-            {
-                var V3WallQ = (Vector3)WallQPosition;
-                CastQ(V3WallQ);
-                return;
-            }
-
-            var TumbleQEPosition = GetQEPosition();
-            if (TumbleQEPosition != Vector3.Zero)
-            {
-                CastQ(TumbleQEPosition);
-                return;
-            }
-
-            Orbwalker.ForcedTarget = target;
-
-            if (ObjectManager.Player.CountEnemiesInRange(1500f) >= 3)
-            {
-
-            }
-
-            CastQ(Position);
-        }
-
         public static bool IsNotIntoEnemies(this Vector3 position)
         {
             if (!smartq && !noqenemies)
@@ -1172,246 +1173,9 @@ namespace Vayne
             return (allies - lowHealthAllies.Count() + allyTurrets.Count() * 2 + 1 >= enemies - lowHealthEnemies.Count() + (!ObjectManager.Player.UnderTurret(true) ? enemyTurrets.Count() * 2 : 0));
         }
 
-        public static Vector3 GetSOLOVayneQPosition()
-        {
-            #region The Required Variables
-            var positions = GetRotatedQPositions();
-            var enemyPositions = GetEnemyPoints();
-            var safePositions = positions.Where(pos => !enemyPositions.Contains(pos.To2D())).ToList();
-            var BestPosition = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f);
-            var AverageDistanceWeight = .60f;
-            var ClosestDistanceWeight = .40f;
-
-            var bestWeightedAvg = 0f;
-
-            var highHealthEnemiesNear = EntityManager.Heroes.Enemies.Where(m => !m.IsMelee && m.IsValidTarget(1300f) && m.HealthPercent > 7).ToList();
-
-            var alliesNear = EntityManager.Heroes.Allies.Count(ally => !ally.IsMe && ally.IsValidTarget(1500f, false));
-
-            var enemiesNear = EntityManager.Heroes.Enemies.Where(m => m.IsValidTarget(m.GetAutoAttackRange() + 300f + 65f)).ToList();
-            #endregion
-
-
-            #region 1 Enemy around only
-            if (ObjectManager.Player.CountEnemiesInRange(1500f) <= 1)
-            {
-                //Logic for 1 enemy near
-                var position = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f);
-                return ((Vector3)(position)).IsSafeEx() ? position.To3D() : Vector3.Zero;
-            }
-            #endregion
-
-            if (enemiesNear.Any(t => t.Health + 15 < ObjectManager.Player.GetAutoAttackDamage(t) * 2 + myHero.GetSpellDamage(t, SpellSlot.Q) && t.Distance(ObjectManager.Player) < t.GetAutoAttackRange() + 80f))
-            {
-                var QPosition = ObjectManager.Player.ServerPosition.Extend(enemiesNear.OrderBy(t => t.Health).First().ServerPosition, 300f).To3D();
-
-                if (!QPosition.UnderTurret(true))
-                {
-                    return QPosition;
-                }
-            }
-
-            #region Alone, 2 Enemies, 1 Killable
-            if (enemiesNear.Count() <= 2)
-            {
-                if (enemiesNear.Any(t => t.Health + 15 < ObjectManager.Player.GetAutoAttackDamage(t) * 2 + myHero.GetSpellDamage(t, SpellSlot.Q) && t.Distance(ObjectManager.Player) < t.GetAutoAttackRange() + 80f))
-                {
-                    var QPosition = ObjectManager.Player.ServerPosition.Extend(highHealthEnemiesNear.OrderBy(t => t.Health).First().ServerPosition, 300f).To3D();
-
-                    if (!QPosition.UnderTurret(true))
-                    {
-                        return QPosition;
-                    }
-                }
-            }
-            #endregion
-
-            #region Alone, 2 Enemies, None Killable
-            if (alliesNear == 0 && highHealthEnemiesNear.Count() <= 2)
-            {
-                var backwardsPosition = (ObjectManager.Player.ServerPosition.To2D() + 300f * ObjectManager.Player.Direction.To2D()).To3D();
-
-                if (!backwardsPosition.UnderTurret(true))
-                {
-                    return backwardsPosition;
-                }
-            }
-            #endregion
-
-            #region Already in an enemy's attack range.
-            var closeNonMeleeEnemy = GetClosestEnemy((Vector3)ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f));
-
-            if (closeNonMeleeEnemy != null
-                && ObjectManager.Player.Distance(closeNonMeleeEnemy) <= closeNonMeleeEnemy.AttackRange - 85
-                && !closeNonMeleeEnemy.IsMelee)
-            {
-                return ((Vector3)ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f)).IsSafeEx() ? ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D() : Vector3.Zero;
-            }
-            #endregion
-
-            #region Logic for multiple enemies / allies around.
-            foreach (var position in safePositions)
-            {
-                var enemy = GetClosestEnemy(position);
-                if (!enemy.IsValidTarget())
-                {
-                    continue;
-                }
-
-                var avgDist = GetAvgDistance(position);
-
-                if (avgDist > -1)
-                {
-                    var closestDist = ObjectManager.Player.ServerPosition.Distance(enemy.ServerPosition);
-                    var weightedAvg = closestDist * ClosestDistanceWeight + avgDist * AverageDistanceWeight;
-                    if (weightedAvg > bestWeightedAvg && position.IsSafeEx())
-                    {
-                        bestWeightedAvg = weightedAvg;
-                        BestPosition = position.To2D();
-                    }
-                }
-            }
-            #endregion
-
-            var endPosition = (BestPosition.To3D()).IsSafe() ? BestPosition.To3D() : Vector3.Zero;
-
-            #region Couldn't find a suitable position, tumble to nearest ally logic
-            if (endPosition == Vector3.Zero)
-            {
-                //Try to find another suitable position. This usually means we are already near too much enemies turrets so just gtfo and tumble
-                //to the closest ally ordered by most health.
-                var alliesClose = EntityManager.Heroes.Allies.Where(ally => !ally.IsMe && ally.IsValidTarget(1500f, false)).ToList();
-                if (alliesClose.Any() && enemiesNear.Any())
-                {
-                    var closestMostHealth =
-                    alliesClose.OrderBy(m => m.Distance(ObjectManager.Player)).ThenByDescending(m => m.Health).FirstOrDefault();
-
-                    if (closestMostHealth != null
-                        && closestMostHealth.Distance(enemiesNear.OrderBy(m => m.Distance(ObjectManager.Player)).FirstOrDefault())
-                        > ObjectManager.Player.Distance(enemiesNear.OrderBy(m => m.Distance(ObjectManager.Player)).FirstOrDefault()))
-                    {
-                        var tempPosition = ObjectManager.Player.ServerPosition.Extend(closestMostHealth.ServerPosition, 300f).To3D();
-                        if (tempPosition.IsSafeEx())
-                        {
-                            endPosition = tempPosition;
-                        }
-                    }
-
-                }
-            }
-            #endregion
-
-            #region Couldn't find an ally, tumble inside bush
-            var AmInBush = NavMesh.IsWallOfGrass(ObjectManager.Player.ServerPosition, 33);
-            var closeEnemies = EnemiesClose.ToList();
-            //I'm not in bush, all the enemies close are outside a bush
-            if (!AmInBush && endPosition == Vector3.Zero)
-            {
-                var PositionsComplete = GetCompleteRotatedQPositions();
-                foreach (var position in PositionsComplete)
-                {
-                    //The end position is a wall of grass
-                    //All enemies are outside of the bush and at least 340 units away
-                    //There are no detected wards in that bush
-                    if (NavMesh.IsWallOfGrass(position, 33) && closeEnemies.All(m => m.Distance(position) > 340f && !NavMesh.IsWallOfGrass(m.ServerPosition, 40)) && !WardTracker.WardTrackerVariables.detectedWards.Any(m => NavMesh.IsWallOfGrass(m.Position, 33) && m.Position.Distance(position) < m.WardTypeW.WardVisionRange))
-                    {
-                        if (position.IsSafe())
-                        {
-                            endPosition = position;
-                            break;
-                        }
-                    }
-                }
-            }
-            #endregion
-
-
-            #region Couldn't even tumble to ally, just go to mouse
-            if (endPosition == Vector3.Zero)
-            {
-                var mousePosition = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D();
-                if (mousePosition.IsSafe())
-                {
-                    endPosition = mousePosition;
-                }
-            }
-            #endregion
-
-            if (ObjectManager.Player.HealthPercent < 10 && ObjectManager.Player.CountEnemiesInRange(1500) > 1)
-            {
-                var position = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D();
-                return position.IsSafeEx() ? position : endPosition;
-            }
-
-            return endPosition;
-        }
-
-        public static List<Vector3> GetCompleteRotatedQPositions()
-        {
-            const int currentStep = 30;
-            var direction = (Game.CursorPos - ObjectManager.Player.ServerPosition).Normalized().To2D();
-
-            var list = new List<Vector3>();
-            for (var i = -0; i <= 360; i += currentStep)
-            {
-                var angleRad = DegreeToRadian(i);
-                var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
-                list.Add(rotatedPosition.To3D());
-            }
-            return list;
-        }
-
-        public static List<Vector3> GetRotatedQPositions()
-        {
-            const int currentStep = 30;
-            // var direction = ObjectManager.Player.Direction.To2D().Perpendicular();
-            var direction = (Game.CursorPos - ObjectManager.Player.ServerPosition).Normalized().To2D();
-
-            var list = new List<Vector3>();
-            for (var i = -105; i <= 105; i += currentStep)
-            {
-                var angleRad = DegreeToRadian(i);
-                var rotatedPosition = ObjectManager.Player.Position.To2D() + (300f * direction.Rotated(angleRad));
-                list.Add(rotatedPosition.To3D());
-            }
-            return list;
-        }
-
         public static float DegreeToRadian(double angle)
         {
             return (float)(Math.PI * angle / 180.0);
-        }
-
-        public static AIHeroClient GetClosestEnemy(Vector3 from)
-        {
-            if (TargetSelector.SelectedTarget is AIHeroClient)
-            {
-                var owAI = TargetSelector.SelectedTarget as AIHeroClient;
-                if (owAI.IsValidTarget(myHero.GetAutoAttackRange() + 120f, true, from))
-                {
-                    return owAI;
-                }
-            }
-
-            return null;
-        }
-
-        public static float GetAvgDistance(Vector3 from)
-        {
-            var numberOfEnemies = from.CountEnemiesInRange(1200f);
-            if (numberOfEnemies != 0)
-            {
-                var enemies = EntityManager.Heroes.Enemies.Where(en => en.IsValidTarget(1200f, true, from) && en.Health > ObjectManager.Player.GetAutoAttackDamage(en) * 3 + myHero.GetSpellDamage(en, SpellSlot.W) + myHero.GetSpellDamage(en, SpellSlot.Q)).ToList();
-                var enemiesEx = EntityManager.Heroes.Enemies.Where(en => en.IsValidTarget(1200f, true, from)).ToList();
-                var LHEnemies = enemiesEx.Count() - enemies.Count();
-
-                var totalDistance = (LHEnemies > 1 && enemiesEx.Count() > 2) ?
-                    enemiesEx.Sum(en => en.Distance(ObjectManager.Player.ServerPosition)) :
-                    enemies.Sum(en => en.Distance(ObjectManager.Player.ServerPosition));
-
-                return totalDistance / numberOfEnemies;
-            }
-            return -1;
         }
 
         private static Vector3[] GetWallQPositions(Obj_AI_Base player, float Range)
@@ -1539,11 +1303,36 @@ namespace Vayne
 
         #region Menu
 
-        private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu, ItemMenu;
+        private static Menu Menu, ComboMenu, QSettings, CondemnSettings, ESettings, FarmSettings, ExtraMenu, DrawingMenu, ItemMenu, GPMenu, GPSub;
 
+        public static void BuildMenu()
+        {
+            GPMenu = MainMenu.AddMenu("[VHR] Anti-GP List", "dz191.vhr.agplist");
+            {
+                var enemyHeroesNames = ObjectManager.Get<AIHeroClient>().Where(h => h.IsEnemy).Select(hero => hero.ChampionName).ToList();
+
+                foreach (var champ in enemyHeroesNames)
+                {
+                    if (CustomAntigapcloser.Spells.All(h => h.ChampionName != champ))
+                    {
+                        continue;
+                    }
+                }
+
+                foreach (var gp in CustomAntigapcloser.Spells.Where(h => enemyHeroesNames.Contains(h.ChampionName)))
+                {
+                    GPSub = GPMenu.AddSubMenu(string.Format("{0}", gp.ChampionName.ToUpperInvariant()));
+
+                    GPSub.Add(string.Format("dz191.vhr.agplist.{0}.{1}", gp.ChampionName.ToLowerInvariant(), gp.SpellName), new CheckBox(gp.ChampionName + " " + gp.Slot + " (" + gp.SpellName + ")", true));
+                }
+            }
+        }
 
         private static void InitMenu()
         {
+
+            BuildMenu();
+
             Menu = MainMenu.AddMenu("Vayne", "Vayne");
             Menu.AddLabel("Base Ported from Challenger Series & features ported from many other assemblies on L# - Berb");
             Menu.AddSeparator();
@@ -2044,7 +1833,7 @@ namespace Vayne
 
         public static bool IsValidTarget(AIHeroClient target)
         {
-            var targetPosition = Geometry.PositionAfter(target.GetWaypoints(), 300, (int)target.MoveSpeed);
+            var targetPosition = LS.Geometry.PositionAfter(target.GetWaypoints(), 300, (int)target.MoveSpeed);
 
             if (target.Distance(ObjectManager.Player.ServerPosition) < 650f && IsCondemnable(ObjectManager.Player.ServerPosition.To2D(), targetPosition, target.BoundingRadius))
             {
@@ -2083,7 +1872,7 @@ namespace Vayne
                         var vec = new Vector2(x, y);
                         if (targetPosition.Distance(vec) < 550f && IsCondemnable(vec, targetPosition, target.BoundingRadius, 300f))
                         {
-                            if (!TumbleCondemnSafe || IsSafe(target, vec.To3D(), false).IsValid())
+                            if (!TumbleCondemnSafe || Tumble.IsSafe(target, vec.To3D(), false).IsValid())
                             {
                                 myHero.Spellbook.CastSpell(SpellSlot.Q, (Vector3)vec);
                                 break;
@@ -2107,77 +1896,6 @@ namespace Vayne
             result.Y = (float)(temp.X * Math.Sin(angle) + temp.Y * Math.Cos(angle)) / 4;
             result = Vector2.Add(result, point1);
             return result;
-        }
-
-        public static Vector3 IsSafe(AIHeroClient target, Vector3 vec, bool checkTarget = true)
-        {
-            if (DontSafeCheck)
-                return vec;
-
-            if (checkTarget)
-            {
-                if (target.ServerPosition.To2D().Distance(vec) <= target.AttackRange)
-                {
-                    if (vec.CountEnemiesInRange(1000) > 1)
-                        return Vector3.Zero;
-                    else if (target.ServerPosition.To2D().Distance(vec) <= target.AttackRange / 2f)
-                        return Deviation(ObjectManager.Player.ServerPosition.To2D(), target.ServerPosition.To2D(), 60).To3D();
-                }
-
-                if (((DontQIntoEnemies || target.IsMelee) && EntityManager.Heroes.Enemies.Any(p => p.ServerPosition.To2D().Distance(vec) <= p.AttackRange + ObjectManager.Player.BoundingRadius + (p.IsMelee ? 100 : 0))) || vec.UnderTurret(true))
-                    return Vector3.Zero;
-            }
-            if (EntityManager.Heroes.Enemies.Any(p => p.NetworkId != target.NetworkId && p.ServerPosition.To2D().Distance(vec) <= p.AttackRange + (p.IsMelee ? 50 : 0)) || vec.UnderTurret(true))
-                return Vector3.Zero;
-
-            return vec;
-        }
-
-        public static Vector3 FindTumblePosition(AIHeroClient target)
-        {
-            if ((Only2W) && target.GetBuffCount("vaynesilvereddebuff") == 1) // == 1 cuz calling this after attack which is aa missile still flying
-                return Vector3.Zero;
-
-            if (Wall)
-            {
-                var outRadius = ObjectManager.Player.BoundingRadius / (float)Math.Cos(2 * Math.PI / 8);
-
-                for (var i = 1; i <= 8; i++)
-                {
-                    var angle = i * 2 * Math.PI / 8;
-                    float x = ObjectManager.Player.Position.X + outRadius * (float)Math.Cos(angle);
-                    float y = ObjectManager.Player.Position.Y + outRadius * (float)Math.Sin(angle);
-                    var colFlags = NavMesh.GetCollisionFlags(x, y);
-                    if (colFlags.HasFlag(CollisionFlags.Wall) || colFlags.HasFlag(CollisionFlags.Building))
-                        return new Vector3(x, y, 0);
-                }
-            }
-
-            if (sacMode == 0)
-            {
-                Vector3 vec = target.ServerPosition;
-
-                if (target.Path.Length > 0)
-                {
-                    if (ObjectManager.Player.Distance(vec) < ObjectManager.Player.Distance(target.Path.Last()))
-                        return IsSafe(target, Game.CursorPos);
-                    else
-                        return IsSafe(target, Game.CursorPos.To2D().Rotated(DegreeToRadian((vec - ObjectManager.Player.ServerPosition).To2D().AngleBetween((Game.CursorPos - ObjectManager.Player.ServerPosition).To2D()) % 90)).To3D());
-                }
-                else
-                {
-                    if (target.IsMelee)
-                        return IsSafe(target, Game.CursorPos);
-                }
-
-                return IsSafe(target, ObjectManager.Player.ServerPosition + (target.ServerPosition - ObjectManager.Player.ServerPosition).Normalized().To2D().Rotated(DegreeToRadian(90 - (vec - ObjectManager.Player.ServerPosition).To2D().AngleBetween((Game.CursorPos - ObjectManager.Player.ServerPosition).To2D()))).To3D() * 300f);
-            }
-            else if (sacMode == 1)
-            {
-                return Game.CursorPos;
-            }
-
-            return Vector3.Zero;
         }
 
         private static bool IsCondemnable(Vector2 from, Vector2 targetPosition, float boundingRadius, float pushRange = -1)

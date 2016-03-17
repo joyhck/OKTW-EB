@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "League of Draven", "League of Draven.csproj", "{E33B1D4D-2DEE-4D86-BE18-1D7CFDF49548}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "League of Dravenasd", "League of Dravenasd.csproj", "{E33B1D4D-2DEE-4D86-BE18-1D7CFDF49548}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

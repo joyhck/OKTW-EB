@@ -946,7 +946,7 @@ namespace LeagueSharp.Common
         /// <returns>System.Single.</returns>
         public float GetDamage(Obj_AI_Base target, int stage = 0)
         {
-            return (float)ObjectManager.Player.GetSpellDamage(target, Slot, stage);
+            return (float)ObjectManager.Player.LSGetSpellDamage(target, Slot, stage);
         }
 
         /// <summary>
@@ -980,7 +980,7 @@ namespace LeagueSharp.Common
         /// <returns><c>true</c> if the specified target is killable; otherwise, <c>false</c>.</returns>
         public bool IsKillable(Obj_AI_Base target, int stage = 0)
         {
-            return ObjectManager.Player.GetSpellDamage(target, Slot, stage) > target.Health;
+            return ObjectManager.Player.LSGetSpellDamage(target, Slot, stage) > target.Health;
         }
 
         /// <summary>

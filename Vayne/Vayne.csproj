@@ -32,10 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="clipper_library">
-      <HintPath>..\..\..\..\..\..\LeagueSharp\System\clipper_library.dll</HintPath>
-      <Aliases>destination</Aliases>
-    </Reference>
     <Reference Include="EloBuddy">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\EloBuddy\System\EloBuddy.dll</HintPath>
     </Reference>
@@ -70,44 +66,54 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Evadespells\EvadeSpellData.cs" />
-    <Compile Include="Evadespells\EvadeSpellDatabase.cs" />
-    <Compile Include="Geometry.cs" />
-    <Compile Include="Orbwalker\Config.cs" />
-    <Compile Include="Orbwalker\Cursor.cs" />
-    <Compile Include="Orbwalker\CustomEvents.cs" />
-    <Compile Include="Orbwalker\Damage.cs" />
-    <Compile Include="Orbwalker\Dash.cs" />
-    <Compile Include="Orbwalker\EnumerableExtensions.cs" />
-    <Compile Include="Orbwalker\Geometry.cs" />
-    <Compile Include="Orbwalker\HealthPrediction.cs" />
-    <Compile Include="Orbwalker\HeroManager.cs" />
-    <Compile Include="Orbwalker\Interrupter2.cs" />
-    <Compile Include="Orbwalker\ItemData.cs" />
-    <Compile Include="Orbwalker\Items.cs" />
-    <Compile Include="Orbwalker\Keys.cs" />
-    <Compile Include="Orbwalker\LastCastedSpell.cs" />
-    <Compile Include="Orbwalker\MasteryData.cs" />
-    <Compile Include="Orbwalker\MEC.cs" />
-    <Compile Include="Orbwalker\MinionManager.cs" />
-    <Compile Include="Orbwalker\NativeMethods.cs" />
-    <Compile Include="Orbwalker\OnValueChangeEventArgs.cs" />
-    <Compile Include="Orbwalker\Orbwalking.cs" />
-    <Compile Include="Orbwalker\Prediction.cs" />
-    <Compile Include="Orbwalker\Render.cs" />
-    <Compile Include="Orbwalker\Spell.cs" />
-    <Compile Include="Orbwalker\StringList.cs" />
-    <Compile Include="Orbwalker\TargetSelector.cs" />
-    <Compile Include="Orbwalker\Utility.cs" />
-    <Compile Include="Orbwalker\Utils.cs" />
-    <Compile Include="Orbwalker\WindowsMessages.cs" />
-    <Compile Include="Orbwalker\WndEventComposition.cs" />
-    <Compile Include="SOLOVayne.cs" />
+    <Compile Include="SAC\Geometry.cs" />
+    <Compile Include="SAC\Tumble.cs" />
+    <Compile Include="SOLOVayne\Condemn\CondemnLogicProvider.cs" />
+    <Compile Include="SOLOVayne\CustomAntigapcloser.cs" />
+    <Compile Include="SOLOVayne\Jungle.cs" />
+    <Compile Include="SOLOVayne\Tumble\TumbleExtensions.cs" />
+    <Compile Include="SOLOVayne\Tumble\TumbleHelper.cs" />
+    <Compile Include="SOLOVayne\Tumble\TumbleLogicProvider.cs" />
+    <Compile Include="SOLOVayne\Tumble\TumbleVariables.cs" />
+    <Compile Include="Utility\Evadespells\EvadeSpellData.cs" />
+    <Compile Include="Utility\Evadespells\EvadeSpellDatabase.cs" />
+    <Compile Include="Utility\Geometry.cs" />
+    <Compile Include="Utility\Orbwalker\Config.cs" />
+    <Compile Include="Utility\Orbwalker\Cursor.cs" />
+    <Compile Include="Utility\Orbwalker\CustomEvents.cs" />
+    <Compile Include="Utility\Orbwalker\Damage.cs" />
+    <Compile Include="Utility\Orbwalker\Dash.cs" />
+    <Compile Include="Utility\Orbwalker\EnumerableExtensions.cs" />
+    <Compile Include="SOLOVayne\GaneObjects.cs" />
+    <Compile Include="Utility\Orbwalker\Geometry.cs" />
+    <Compile Include="Utility\Orbwalker\HealthPrediction.cs" />
+    <Compile Include="Utility\Orbwalker\HeroManager.cs" />
+    <Compile Include="Utility\Orbwalker\Interrupter2.cs" />
+    <Compile Include="Utility\Orbwalker\ItemData.cs" />
+    <Compile Include="Utility\Orbwalker\Items.cs" />
+    <Compile Include="Utility\Orbwalker\Keys.cs" />
+    <Compile Include="Utility\Orbwalker\LastCastedSpell.cs" />
+    <Compile Include="Utility\Orbwalker\MasteryData.cs" />
+    <Compile Include="Utility\Orbwalker\MEC.cs" />
+    <Compile Include="Utility\Orbwalker\MinionManager.cs" />
+    <Compile Include="Utility\Orbwalker\NativeMethods.cs" />
+    <Compile Include="Utility\Orbwalker\OnValueChangeEventArgs.cs" />
+    <Compile Include="Utility\Orbwalker\Orbwalking.cs" />
+    <Compile Include="Utility\Orbwalker\Prediction.cs" />
+    <Compile Include="Utility\Orbwalker\Render.cs" />
+    <Compile Include="Utility\Orbwalker\Spell.cs" />
+    <Compile Include="Utility\Orbwalker\StringList.cs" />
+    <Compile Include="Utility\Orbwalker\TargetSelector.cs" />
+    <Compile Include="Utility\Orbwalker\Utility.cs" />
+    <Compile Include="Utility\Orbwalker\Utils.cs" />
+    <Compile Include="Utility\Orbwalker\WindowsMessages.cs" />
+    <Compile Include="Utility\Orbwalker\WndEventComposition.cs" />
+    <Compile Include="SOLOVayne\SOLOVayne.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WardTracker\WardDetector.cs" />
-    <Compile Include="WardTracker\WardTrackerVariables.cs" />
-    <Compile Include="YasuoWall.cs" />
+    <Compile Include="Utility\WardTracker\WardDetector.cs" />
+    <Compile Include="Utility\WardTracker\WardTrackerVariables.cs" />
+    <Compile Include="SOLOVayne\YasuoWall.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -117,6 +123,7 @@
     <Content Include="Resources\SliderActive.png" />
     <Content Include="Resources\SliderDisabled.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

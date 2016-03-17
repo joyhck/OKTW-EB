@@ -240,7 +240,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Akali",
                 IsActive = (source, target) => target.HasBuff("AkaliMota"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.Q, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.Q, 1)
             };
 
             AttackPassives.Add(p);
@@ -692,7 +692,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Jayce",
                 IsActive = (source, target) => source.HasBuff("jaycehypercharge"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.W, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.W, 1)
             };
 
             AttackPassives.Add(p);
@@ -799,7 +799,7 @@ namespace LeagueSharp.Common
                 IsActive = (source, target) => source.GetSpell(SpellSlot.W).Level > 0,
                 GetDamage =
                     (source, target) =>
-                    source.GetSpellDamage(target, SpellSlot.W, source.HasBuff("NetherBlade") ? 1 : 0)
+                    source.LSGetSpellDamage(target, SpellSlot.W, source.HasBuff("NetherBlade") ? 1 : 0)
             };
 
             #endregion
@@ -810,7 +810,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Katarina",
                 IsActive = (source, target) => (target.HasBuff("katarinaqmark")),
-                GetDamage = (source, target) => ((float)source.GetSpellDamage(target, SpellSlot.Q, 1)),
+                GetDamage = (source, target) => ((float)source.LSGetSpellDamage(target, SpellSlot.Q, 1)),
             };
             AttackPassives.Add(p);
 
@@ -1095,7 +1095,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Nidalee",
                 IsActive = (source, target) => source.HasBuff("Takedown"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.Q, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.Q, 1)
             };
 
             AttackPassives.Add(p);
@@ -1246,7 +1246,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Rengar",
                 IsActive = (source, target) => source.HasBuff("rengarqemp"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.Q, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.Q, 1)
             };
 
             AttackPassives.Add(p);
@@ -1366,10 +1366,10 @@ namespace LeagueSharp.Common
                 IsActive = (source, target) => source.HasBuff("shenqbuff"),
                 GetDamage = (source, target) =>
                 {
-                    var dmg = source.GetSpellDamage(target, SpellSlot.Q);
+                    var dmg = source.LSGetSpellDamage(target, SpellSlot.Q);
                     if (target.Type == GameObjectType.AIHeroClient && target.HasBuff("ShenQSlow"))
                     {
-                        dmg += source.GetSpellDamage(target, SpellSlot.Q, 1);
+                        dmg += source.LSGetSpellDamage(target, SpellSlot.Q, 1);
                     }
                     return dmg;
                 }
@@ -1405,7 +1405,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Shyvana",
                 IsActive = (source, target) => target.HasBuff("ShyvanaFireballMissile"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.E, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.E, 1)
             };
 
             AttackPassives.Add(p);
@@ -1438,7 +1438,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Skarner",
                 IsActive = (source, target) => target.HasBuff("skarnerpassivebuff"),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.E, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.E, 1)
             };
 
             AttackPassives.Add(p);
@@ -1567,7 +1567,7 @@ namespace LeagueSharp.Common
             {
                 ChampionName = "Thresh",
                 IsActive = (source, target) => source.Buffs.Any(x => x.Name.Contains("threshqpassive")),
-                GetDamage = (source, target) => source.GetSpellDamage(target, SpellSlot.E, 1)
+                GetDamage = (source, target) => source.LSGetSpellDamage(target, SpellSlot.E, 1)
             };
 
             AttackPassives.Add(p);
@@ -1623,7 +1623,7 @@ namespace LeagueSharp.Common
                 IsActive = (source, target) => (source.HasBuff("redcardpreattack")),
                 GetDamage =
                             (source, target) =>
-                            (float)source.GetSpellDamage(target, SpellSlot.W, 2)
+                            (float)source.LSGetSpellDamage(target, SpellSlot.W, 2)
                             - (float)
                               source.CalcDamage(
                                   target,
@@ -1638,7 +1638,7 @@ namespace LeagueSharp.Common
                 IsActive = (source, target) => (source.HasBuff("goldcardpreattack")),
                 GetDamage =
                             (source, target) =>
-                            (float)source.GetSpellDamage(target, SpellSlot.W, 3)
+                            (float)source.LSGetSpellDamage(target, SpellSlot.W, 3)
                             - (float)
                               source.CalcDamage(
                                   target,
@@ -6957,7 +6957,7 @@ namespace LeagueSharp.Common
         /// <param name="target">The target.</param>
         /// <param name="includePassive">if set to <c>true</c> [include passive].</param>
         /// <returns></returns>
-        public static double GetAutoAttackDamage(
+        public static double LSGetAutoAttackDamage(
             this Obj_AI_Base source,
             Obj_AI_Base target,
             bool includePassive = false)
@@ -7075,7 +7075,7 @@ namespace LeagueSharp.Common
             Obj_AI_Base target,
             IEnumerable<Tuple<SpellSlot, int>> spellCombo)
         {
-            return spellCombo.Sum(spell => source.GetSpellDamage(target, spell.Item1, spell.Item2));
+            return spellCombo.Sum(spell => source.LSGetSpellDamage(target, spell.Item1, spell.Item2));
         }
 
         /// <summary>
@@ -7108,7 +7108,7 @@ namespace LeagueSharp.Common
                 return new DamageSpell
                 {
                     DamageType = DamageType.Physical,
-                    CalculatedDamage = GetAutoAttackDamage(source, target, true),
+                    CalculatedDamage = LSGetAutoAttackDamage(source, target, true),
                 };
             }
 
@@ -7166,7 +7166,7 @@ namespace LeagueSharp.Common
         /// <param name="target">The target.</param>
         /// <param name="spellName">Name of the spell.</param>
         /// <returns></returns>
-        public static double GetSpellDamage(this Obj_AI_Base source, Obj_AI_Base target, string spellName)
+        public static double LSGetSpellDamage(this Obj_AI_Base source, Obj_AI_Base target, string spellName)
         {
             var spell = GetDamageSpell(source, target, spellName);
             return spell != null ? spell.CalculatedDamage : 0d;
@@ -7180,7 +7180,7 @@ namespace LeagueSharp.Common
         /// <param name="slot">The slot.</param>
         /// <param name="stage">The stage.</param>
         /// <returns></returns>
-        public static double GetSpellDamage(this AIHeroClient source, Obj_AI_Base target, SpellSlot slot, int stage = 0)
+        public static double LSGetSpellDamage(this AIHeroClient source, Obj_AI_Base target, SpellSlot slot, int stage = 0)
         {
             var spell = GetDamageSpell(source, target, slot, stage);
             return spell != null ? spell.CalculatedDamage : 0d;

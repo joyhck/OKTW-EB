@@ -46,9 +46,9 @@ namespace LeagueSharp.Common
         /// <param name="anotherUnit">Another unit.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(Obj_AI_Base anotherUnit, bool squared = false)
+        public static float LSDistance(Obj_AI_Base anotherUnit, bool squared = false)
         {
-            return ObjectManager.Player.Distance(anotherUnit, squared);
+            return ObjectManager.Player.LSDistance(anotherUnit, squared);
         }
 
         /// <summary>
@@ -58,9 +58,9 @@ namespace LeagueSharp.Common
         /// <param name="anotherUnit">Another unit.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
+        public static float LSDistance(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
         {
-            return unit.ServerPosition.To2D().Distance(anotherUnit.ServerPosition.To2D(), squared);
+            return unit.ServerPosition.LSTo2D().LSDistance(anotherUnit.ServerPosition.LSTo2D(), squared);
         }
 
         /// <summary>
@@ -70,9 +70,9 @@ namespace LeagueSharp.Common
         /// <param name="anotherUnit">Another unit.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Obj_AI_Base unit, AttackableUnit anotherUnit, bool squared = false)
+        public static float LSDistance(this Obj_AI_Base unit, AttackableUnit anotherUnit, bool squared = false)
         {
-            return unit.ServerPosition.To2D().Distance(anotherUnit.Position.To2D(), squared);
+            return unit.ServerPosition.LSTo2D().LSDistance(anotherUnit.Position.LSTo2D(), squared);
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace LeagueSharp.Common
         /// <param name="point">The point.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Obj_AI_Base unit, Vector3 point, bool squared = false)
+        public static float LSDistance(this Obj_AI_Base unit, Vector3 point, bool squared = false)
         {
-            return unit.ServerPosition.To2D().Distance(point.To2D(), squared);
+            return unit.ServerPosition.LSTo2D().LSDistance(point.LSTo2D(), squared);
         }
 
         /// <summary>
@@ -94,9 +94,9 @@ namespace LeagueSharp.Common
         /// <param name="point">The point.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Obj_AI_Base unit, Vector2 point, bool squared = false)
+        public static float LSDistance(this Obj_AI_Base unit, Vector2 point, bool squared = false)
         {
-            return unit.ServerPosition.To2D().Distance(point, squared);
+            return unit.ServerPosition.LSTo2D().LSDistance(point, squared);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="v">The v.</param>
         /// <returns></returns>
-        public static Vector2 To2D(this Vector3 v)
+        public static Vector2 LSTo2D(this Vector3 v)
         {
             return new Vector2(v.X, v.Y);
         }
@@ -132,9 +132,9 @@ namespace LeagueSharp.Common
         /// <param name="other">The other.</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Vector3 v, Vector3 other, bool squared = false)
+        public static float LSDistance(this Vector3 v, Vector3 other, bool squared = false)
         {
-            return v.To2D().Distance(other, squared);
+            return v.LSTo2D().LSDistance(other, squared);
         }
 
         //Vector2 class extended methods:
@@ -205,7 +205,7 @@ namespace LeagueSharp.Common
         /// <param name="to">To.</param>
         /// <param name="squared">if set to <c>true</c> gets the distance squared.</param>
         /// <returns></returns>
-        public static float Distance(this Vector2 v, Vector2 to, bool squared = false)
+        public static float LSDistance(this Vector2 v, Vector2 to, bool squared = false)
         {
             return squared ? Vector2.DistanceSquared(v, to) : Vector2.Distance(v, to);
         }
@@ -217,9 +217,9 @@ namespace LeagueSharp.Common
         /// <param name="to">To.</param>
         /// <param name="squared">if set to <c>true</c> gets the distance squared.</param>
         /// <returns></returns>
-        public static float Distance(this Vector2 v, Vector3 to, bool squared = false)
+        public static float LSDistance(this Vector2 v, Vector3 to, bool squared = false)
         {
-            return v.Distance(to.To2D(), squared);
+            return v.LSDistance(to.LSTo2D(), squared);
         }
 
         /// <summary>
@@ -229,9 +229,9 @@ namespace LeagueSharp.Common
         /// <param name="to">To.</param>
         /// <param name="squared">if set to <c>true</c> gets the distance squared.</param>
         /// <returns></returns>
-        public static float Distance(this Vector2 v, Obj_AI_Base to, bool squared = false)
+        public static float LSDistance(this Vector2 v, Obj_AI_Base to, bool squared = false)
         {
-            return v.Distance(to.ServerPosition.To2D(), squared);
+            return v.LSDistance(to.ServerPosition.LSTo2D(), squared);
         }
 
         /// <summary>
@@ -276,7 +276,7 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="v">The vector.</param>
         /// <returns></returns>
-        public static Vector3 Normalized(this Vector3 v)
+        public static Vector3 LSNormalized(this Vector3 v)
         {
             v.Normalize();
             return v;
@@ -301,9 +301,9 @@ namespace LeagueSharp.Common
         /// <param name="to">The vector to extend to.</param>
         /// <param name="distance">The distance.</param>
         /// <returns></returns>
-        public static Vector3 Extend(this Vector3 v, Vector3 to, float distance)
+        public static Vector3 LSExtend(this Vector3 v, Vector3 to, float distance)
         {
-            return v + distance * (to - v).Normalized();
+            return v + distance * (to - v).LSNormalized();
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace LeagueSharp.Common
         /// <returns></returns>
         public static Vector3 Shorten(this Vector3 v, Vector3 to, float distance)
         {
-            return v - distance * (to - v).Normalized();
+            return v - distance * (to - v).LSNormalized();
         }
 
         /// <summary>
@@ -345,7 +345,7 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="v">The v.</param>
         /// <returns></returns>
-        public static Vector2 Perpendicular(this Vector2 v)
+        public static Vector2 LSPerpendicular(this Vector2 v)
         {
             return new Vector2(-v.Y, v.X);
         }
@@ -366,7 +366,7 @@ namespace LeagueSharp.Common
         /// <param name="v">The vector.</param>
         /// <param name="angle">The angle.</param>
         /// <returns></returns>
-        public static Vector2 Rotated(this Vector2 v, float angle)
+        public static Vector2 LSRotated(this Vector2 v, float angle)
         {
             var c = Math.Cos(angle);
             var s = Math.Sin(angle);
@@ -439,7 +439,7 @@ namespace LeagueSharp.Common
         /// <param name="p1">The first point.</param>
         /// <param name="p2">The second point.</param>
         /// <returns></returns>
-        public static float AngleBetween(this Vector2 p1, Vector2 p2)
+        public static float LSAngleBetween(this Vector2 p1, Vector2 p2)
         {
             var theta = p1.Polar() - p2.Polar();
             if (theta < 0)
@@ -679,7 +679,7 @@ namespace LeagueSharp.Common
             var distance = 0f;
             for (var i = 0; i < path.Count - 1; i++)
             {
-                distance += path[i].Distance(path[i + 1]);
+                distance += path[i].LSDistance(path[i + 1]);
             }
             return distance;
         }
@@ -689,9 +689,9 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="path">The path.</param>
         /// <returns></returns>
-        public static List<Vector2> To2D(this List<Vector3> path)
+        public static List<Vector2> LSTo2D(this List<Vector3> path)
         {
-            return path.Select(point => point.To2D()).ToList();
+            return path.Select(point => point.LSTo2D()).ToList();
         }
 
         /// <summary>
@@ -704,7 +704,7 @@ namespace LeagueSharp.Common
         /// <returns></returns>
         public static Vector2[] CircleCircleIntersection(Vector2 center1, Vector2 center2, float radius1, float radius2)
         {
-            var D = center1.Distance(center2);
+            var D = center1.LSDistance(center2);
             //The Circles dont intersect:
             if (D > radius1 + radius2 || (D <= Math.Abs(radius1 - radius2)))
             {
@@ -715,8 +715,8 @@ namespace LeagueSharp.Common
             var H = (float)Math.Sqrt(radius1 * radius1 - A * A);
             var Direction = (center2 - center1).Normalized();
             var PA = center1 + A * Direction;
-            var S1 = PA + H * Direction.Perpendicular();
-            var S2 = PA - H * Direction.Perpendicular();
+            var S1 = PA + H * Direction.LSPerpendicular();
+            var S2 = PA - H * Direction.LSPerpendicular();
             return new[] { S1, S2 };
         }
 
@@ -899,7 +899,7 @@ namespace LeagueSharp.Common
             {
                 var from = self[i];
                 var to = self[i + 1];
-                var d = (int)to.Distance(from);
+                var d = (int)to.LSDistance(from);
                 if (d > distance)
                 {
                     return from + distance * (to - from).Normalized();
@@ -1032,7 +1032,7 @@ namespace LeagueSharp.Common
             /// <param name="point">The point.</param>
             public void Add(Vector3 point)
             {
-                Points.Add(point.To2D());
+                Points.Add(point.LSTo2D());
             }
 
             /// <summary>
@@ -1091,7 +1091,7 @@ namespace LeagueSharp.Common
             /// <returns></returns>
             public bool IsInside(Vector3 point)
             {
-                return !IsOutside(point.To2D());
+                return !IsOutside(point.LSTo2D());
             }
 
             /// <summary>
@@ -1101,7 +1101,7 @@ namespace LeagueSharp.Common
             /// <returns></returns>
             public bool IsInside(GameObject point)
             {
-                return !IsOutside(point.Position.To2D());
+                return !IsOutside(point.Position.LSTo2D());
             }
 
             /// <summary>
@@ -1154,7 +1154,7 @@ namespace LeagueSharp.Common
                 /// <param name="radius">The radius.</param>
                 /// <param name="quality">The quality.</param>
                 public Arc(Vector3 start, Vector3 direction, float angle, float radius, int quality = 20)
-                    : this(start.To2D(), direction.To2D(), angle, radius, quality) { }
+                    : this(start.LSTo2D(), direction.LSTo2D(), angle, radius, quality) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Polygon.Arc"/> class.
@@ -1182,12 +1182,11 @@ namespace LeagueSharp.Common
                 {
                     Points.Clear();
                     var outRadius = (Radius + offset) / (float)Math.Cos(2 * Math.PI / _quality);
-                    var side1 = EndPos.Rotated(-Angle * 0.5f);
+                    var side1 = EndPos.LSRotated(-Angle * 0.5f);
                     for (var i = 0; i <= _quality; i++)
                     {
-                        var cDirection = side1.Rotated(i * Angle / _quality).Normalized();
-                        Points.Add(
-                            new Vector2(StartPos.X + outRadius * cDirection.X, StartPos.Y + outRadius * cDirection.Y));
+                        var cDirection = side1.LSRotated(i * Angle / _quality).Normalized();
+                        Points.Add(new Vector2(StartPos.X + outRadius * cDirection.X, StartPos.Y + outRadius * cDirection.Y));
                     }
                 }
             }
@@ -1215,7 +1214,7 @@ namespace LeagueSharp.Common
                 /// </value>
                 public float Length
                 {
-                    get { return LineStart.Distance(LineEnd); }
+                    get { return LineStart.LSDistance(LineEnd); }
                     set { LineEnd = (LineEnd - LineStart).Normalized() * value + LineStart; }
                 }
 
@@ -1225,7 +1224,7 @@ namespace LeagueSharp.Common
                 /// <param name="start">The start.</param>
                 /// <param name="end">The end.</param>
                 /// <param name="length">The length.</param>
-                public Line(Vector3 start, Vector3 end, float length = -1) : this(start.To2D(), end.To2D(), length) { }
+                public Line(Vector3 start, Vector3 end, float length = -1) : this(start.LSTo2D(), end.LSTo2D(), length) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Polygon.Line"/> class.
@@ -1281,7 +1280,7 @@ namespace LeagueSharp.Common
                 /// <param name="center">The center.</param>
                 /// <param name="radius">The radius.</param>
                 /// <param name="quality">The quality.</param>
-                public Circle(Vector3 center, float radius, int quality = 20) : this(center.To2D(), radius, quality) { }
+                public Circle(Vector3 center, float radius, int quality = 20) : this(center.LSTo2D(), radius, quality) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Circle"/> class.
@@ -1337,7 +1336,7 @@ namespace LeagueSharp.Common
                 /// <value>
                 /// The perpendicular.
                 /// </value>
-                public Vector2 Perpendicular { get { return Direction.Perpendicular(); } }
+                public Vector2 Perpendicular { get { return Direction.LSPerpendicular(); } }
 
                 /// <summary>
                 /// The end
@@ -1360,7 +1359,7 @@ namespace LeagueSharp.Common
                 /// <param name="start">The start.</param>
                 /// <param name="end">The end.</param>
                 /// <param name="width">The width.</param>
-                public Rectangle(Vector3 start, Vector3 end, float width) : this(start.To2D(), end.To2D(), width) { }
+                public Rectangle(Vector3 start, Vector3 end, float width) : this(start.LSTo2D(), end.LSTo2D(), width) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Rectangle"/> class.
@@ -1428,7 +1427,7 @@ namespace LeagueSharp.Common
                 /// <param name="outerRadius">The outer radius.</param>
                 /// <param name="quality">The quality.</param>
                 public Ring(Vector3 center, float innerRadius, float outerRadius, int quality = 20)
-                    : this(center.To2D(), innerRadius, outerRadius, quality) { }
+                    : this(center.LSTo2D(), innerRadius, outerRadius, quality) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Polygon.Ring"/> class.
@@ -1512,7 +1511,7 @@ namespace LeagueSharp.Common
                 /// <param name="radius">The radius.</param>
                 /// <param name="quality">The quality.</param>
                 public Sector(Vector3 center, Vector3 direction, float angle, float radius, int quality = 20)
-                    : this(center.To2D(), direction.To2D(), angle, radius, quality) { }
+                    : this(center.LSTo2D(), direction.LSTo2D(), angle, radius, quality) { }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="Polygon.Sector"/> class.
@@ -1541,10 +1540,10 @@ namespace LeagueSharp.Common
                     Points.Clear();
                     var outRadius = (Radius + offset) / (float)Math.Cos(2 * Math.PI / _quality);
                     Points.Add(Center);
-                    var side1 = Direction.Rotated(-Angle * 0.5f);
+                    var side1 = Direction.LSRotated(-Angle * 0.5f);
                     for (var i = 0; i <= _quality; i++)
                     {
-                        var cDirection = side1.Rotated(i * Angle / _quality).Normalized();
+                        var cDirection = side1.LSRotated(i * Angle / _quality).Normalized();
                         Points.Add(new Vector2(Center.X + outRadius * cDirection.X, Center.Y + outRadius * cDirection.Y));
                     }
                 }

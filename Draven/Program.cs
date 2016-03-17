@@ -414,18 +414,6 @@ namespace RevampedDraven
                     }
                 }
 
-                var tar = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.IsValid && R.IsInRange(x) && (myHero.GetSpellDamage(x, SpellSlot.R) >= x.Health || x.IsKillableAndValidTarget(myHero.GetSpellDamage(x, SpellSlot.R) * 2, DamageType.Physical, R.Range))).FirstOrDefault();
-                if (tar != null)
-                {
-                    R.Cast(tar);
-                }
-
-                var tara = EntityManager.Heroes.Enemies.Where(x => !x.IsDead && x.IsValid && E.IsInRange(x) && myHero.GetSpellDamage(x, SpellSlot.E) >= x.Health).FirstOrDefault();
-                if (tara != null)
-                {
-                    E.Cast(tar);
-                }
-
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
                     if (useW)
