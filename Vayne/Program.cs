@@ -141,8 +141,6 @@ namespace Vayne
                 return;
             }
 
-            Console.WriteLine("past checks");
-
             if (CleanSpells)
             {
                 if (myHero.HasBuff("zedrdeathmark") || myHero.HasBuff("FizzMarinerDoom") || myHero.HasBuff("MordekaiserChildrenOfTheGrave") || myHero.HasBuff("PoppyDiplomaticImmunity") || myHero.HasBuff("VladimirHemoplague") || myHero.HasBuff("zedulttargetmark") || myHero.HasBuff("AlZaharNetherGrasp"))
@@ -856,17 +854,17 @@ namespace Vayne
                         E.Cast(tg);
                     }
                 }
-                if (UseQFarm && Q.IsReady())
+                if (Q.IsReady())
                 {
-                    if (tg.Name.Contains("SRU_") && !IsDangerousPosition(Game.CursorPos))
+                    if (tg.Name.Contains("SRU_") && !IsDangerousPosition(Game.CursorPos) && useQJG)
                     {
                         myHero.Spellbook.CastSpell(SpellSlot.Q, Game.CursorPos);
                     }
-                    if (EntityManager.MinionsAndMonsters.EnemyMinions.Count(m => m.Position.Distance(myHero.Position) < 550 && m.Health < myHero.GetAutoAttackDamage(m) + myHero.GetSpellDamage(m, SpellSlot.Q)) > 1 && !IsDangerousPosition(Game.CursorPos))
+                    if (useQLane && EntityManager.MinionsAndMonsters.EnemyMinions.Count(m => m.Position.Distance(myHero.Position) < 550 && m.Health < myHero.GetAutoAttackDamage(m) + myHero.GetSpellDamage(m, SpellSlot.Q)) > 1 && !IsDangerousPosition(Game.CursorPos))
                     {
                         myHero.Spellbook.CastSpell(SpellSlot.Q, Game.CursorPos);
                     }
-                    if (UnderAllyTurret(myHero.Position))
+                    if (useQLane && UnderAllyTurret(myHero.Position))
                     {
                         if (EntityManager.MinionsAndMonsters.EnemyMinions.Count(m => m.Position.Distance(myHero.Position) < 550 && m.Health < myHero.GetAutoAttackDamage(m) + myHero.GetSpellDamage(m, SpellSlot.Q)) > 0 && !IsDangerousPosition(Game.CursorPos))
                         {
@@ -1310,7 +1308,8 @@ namespace Vayne
         public static bool UseEAs3rdWProcBool { get { return ExtraMenu["usee3rdwproc"].Cast<CheckBox>().CurrentValue; } }
         public static bool UseQBonusOnEnemiesNotCS { get { return ExtraMenu["useqonenemiesnotcs"].Cast<CheckBox>().CurrentValue; } }
         public static bool UseQOnlyAt2WStacksBool { get { return ExtraMenu["useqonlyon2stackedenemies"].Cast<CheckBox>().CurrentValue; } }
-        public static bool UseQFarm { get { return FarmSettings["useqfarm"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useQLane { get { return FarmSettings["useQLane"].Cast<CheckBox>().CurrentValue; } }
+        public static bool useQJG { get { return FarmSettings["useQJG"].Cast<CheckBox>().CurrentValue; } }
         public static bool UseEJungleFarm { get { return FarmSettings["useejgfarm"].Cast<CheckBox>().CurrentValue; } }
         public static bool DrawWStacksBool { get { return DrawingMenu["drawwstacks"].Cast<CheckBox>().CurrentValue; } }
         public static bool menuKey { get { return DrawingMenu["menuKey"].Cast<CheckBox>().CurrentValue; } }
@@ -1496,7 +1495,8 @@ namespace Vayne
             FarmSettings = Menu.AddSubMenu("Farm Settings", "farm");
             FarmSettings.AddGroupLabel("Farm Menu");
             FarmSettings.AddSeparator();
-            FarmSettings.Add("useqfarm", new CheckBox("Use Q Farm/Jungle")); // UseQFarm
+            FarmSettings.Add("useQLane", new CheckBox("Use Q Lane Clear"));
+            FarmSettings.Add("useQJG", new CheckBox("Use Q Jungle Clear"));
             FarmSettings.Add("useejgfarm", new CheckBox("Use E Jungle")); // UseEJungleFarm
             FarmSettings.AddSeparator();
 
