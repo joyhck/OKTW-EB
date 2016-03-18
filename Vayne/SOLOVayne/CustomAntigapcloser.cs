@@ -641,19 +641,13 @@ namespace SOLOVayne.Utility.General
         private static void Game_OnGameUpdate(EventArgs args)
         {
             ActiveGapclosers.RemoveAll(entry => Utils.TickCount > entry.TickCount + 900);
+
             if (OnEnemyGapcloser == null)
             {
                 return;
             }
 
-            foreach (
-                var gapcloser in
-                    ActiveGapclosers.Where(gapcloser => gapcloser.Sender.IsValidTarget())
-                        .Where(
-                            gapcloser =>
-                                gapcloser.SkillType == GapcloserType.Targeted ||
-                                (gapcloser.SkillType == GapcloserType.Skillshot &&
-                                 ObjectManager.Player.LSDistance(gapcloser.Sender, true) < 250000))) // 500 * 500
+            foreach (var gapcloser in ActiveGapclosers.Where(gapcloser => gapcloser.Sender.IsValidTarget()).Where(gapcloser => gapcloser.SkillType == GapcloserType.Targeted || (gapcloser.SkillType == GapcloserType.Skillshot && ObjectManager.Player.LSDistance(gapcloser.Sender, true) < 250000))) // 500 * 500
             {
                 OnEnemyGapcloser(gapcloser);
             }

@@ -48,7 +48,7 @@ namespace SoloVayne.Skills.Tumble
             {
                 //Logic for 1 enemy near
                 var position = ObjectManager.Player.ServerPosition.Extend(Game.CursorPos, 300f).To3D();
-                return position.IsSafeEx() ? position : Vector3.Zero;
+                return position;
             }
             #endregion
 
