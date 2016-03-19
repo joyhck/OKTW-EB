@@ -475,7 +475,7 @@ namespace LeagueSharp.Common
         /// <returns><c>true</c> if this instance can move the specified extra windup; otherwise, <c>false</c>.</returns>
         public static bool CanMove(float extraWindup, bool disableMissileCheck = false)
         {
-            if (_missileLaunched && Orbwalker.MissileCheck && !disableMissileCheck)
+            if (_missileLaunched && true && !disableMissileCheck)
             {
                 return true;
             }

@@ -26,6 +26,9 @@ namespace PortAIO
                 case "ahri": // DZAhri
                     PortAIO.Champion.Ahri.Program.OnLoad();
                     break;
+                case "akali": // Akali by xQx
+                    PortAIO.Champion.Akali.Program.Main();
+                    break;
                 default:
                     return;
             }

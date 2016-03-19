@@ -73,7 +73,7 @@ namespace LeagueSharp.Common
         /// <summary>
         /// The damage type
         /// </summary>
-        public Damage.DamageType DamageType;
+        public DamageType DamageType;
 
         /// <summary>
         /// The slot
@@ -150,23 +150,6 @@ namespace LeagueSharp.Common
         /// <summary>
         /// The type of damage.
         /// </summary>
-        public enum DamageType
-        {
-            /// <summary>
-            /// Physical damage. (AD)
-            /// </summary>
-            Physical,
-
-            /// <summary>
-            /// Magical damage. (AP)
-            /// </summary>
-            Magical,
-
-            /// <summary>
-            /// True damage
-            /// </summary>
-            True
-        }
 
         /// <summary>
         /// Represnets summoner spells that deal damage.
@@ -495,7 +478,7 @@ namespace LeagueSharp.Common
                 IsActive = (source, target) => (target.HealthPercent < 30),
                 GetDamage = (source, target) =>
                 {
-                    float dmg = (float)source.CalcDamage(target, LeagueSharp.Common.Damage.DamageType.Magical, (target.MaxHealth - target.Health) * (5 + Math.Floor(source.TotalMagicalDamage / 100) * 2.2f) / 100);
+                    float dmg = (float)source.CalcDamage(target, DamageType.Magical, (target.MaxHealth - target.Health) * (5 + Math.Floor(source.TotalMagicalDamage / 100) * 2.2f) / 100);
                     if (!(target is AIHeroClient) && dmg > 150f)
                         dmg = 150f;
                     return dmg;
@@ -7131,16 +7114,11 @@ namespace LeagueSharp.Common
         /// <param name="slot">The slot.</param>
         /// <param name="stage">The stage.</param>
         /// <returns></returns>
-        public static DamageSpell GetDamageSpell(
-            this AIHeroClient source,
-            Obj_AI_Base target,
-            SpellSlot slot,
-            int stage = 0)
+        public static DamageSpell GetDamageSpell(this AIHeroClient source, Obj_AI_Base target, SpellSlot slot, int stage = 0)
         {
             if (Spells.ContainsKey(source.ChampionName))
             {
-                var spell = Spells[source.ChampionName].FirstOrDefault(s => s.Slot == slot && stage == s.Stage)
-                            ?? Spells[source.ChampionName].FirstOrDefault(s => s.Slot == slot);
+                var spell = Spells[source.ChampionName].FirstOrDefault(s => s.Slot == slot && stage == s.Stage) ?? Spells[source.ChampionName].FirstOrDefault(s => s.Slot == slot);
 
                 if (spell == null)
                 {
@@ -7194,11 +7172,7 @@ namespace LeagueSharp.Common
         /// <param name="damageType">Type of the damage.</param>
         /// <param name="amount">The amount.</param>
         /// <returns></returns>
-        public static double CalcDamage(
-            this Obj_AI_Base source,
-            Obj_AI_Base target,
-            DamageType damageType,
-            double amount)
+        public static double CalcDamage(this Obj_AI_Base source, Obj_AI_Base target, DamageType damageType, double amount)
         {
             var damage = 0d;
             switch (damageType)
@@ -7228,7 +7202,6 @@ namespace LeagueSharp.Common
         {
             var magicResist = target.SpellBlock;
 
-            // Penetration can't reduce magic resist below 0.
             double value;
 
             if (magicResist < 0)
@@ -7244,11 +7217,7 @@ namespace LeagueSharp.Common
                 value = 100 / (100 + (magicResist * source.PercentMagicPenetrationMod) - source.FlatMagicPenetrationMod);
             }
 
-            var damage = DamageReductionMod(
-                source,
-                target,
-                PassivePercentMod(source, target, value) * amount,
-                DamageType.Magical);
+            var damage = DamageReductionMod(source, target, PassivePercentMod(source, target, value) * amount, DamageType.Magical);
 
             return damage;
         }
