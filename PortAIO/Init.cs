@@ -29,7 +29,7 @@ namespace PortAIO
                 case "akali": // Akali by xQx
                     PortAIO.Champion.Akali.Program.Main();
                     break;
-                case "alistar":
+                case "alistar": // El Alistar
                     PortAIO.Champion.Alistar.Program.OnGameLoad();
                     break;
                 default:
