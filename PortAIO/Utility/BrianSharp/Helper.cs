@@ -11,7 +11,7 @@ using SharpDX;
 using Color = System.Drawing.Color;
 using LeagueSharp.Common;
 
-namespace BerbsicAIO.Utility.BrianSharp
+namespace PortAIO.Utility.BrianSharp
 {
     class Helper
     {

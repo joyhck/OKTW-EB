@@ -11,9 +11,9 @@ using SharpDX;
 using Color = System.Drawing.Color;
 using LeagueSharp.Common;
 using LeagueSharp.Common.Data;
-using BerbsicAIO.Utility.BrianSharp;
+using PortAIO.Utility.BrianSharp;
 
-namespace BerbsicAIO.Champion.Aatrox
+namespace PortAIO.Champion.Aatrox
 {
     public static class Program
     {

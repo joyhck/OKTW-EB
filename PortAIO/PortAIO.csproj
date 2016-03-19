@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>BerbsicAIO.Init</StartupObject>
+    <StartupObject>PortAIO.Init</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EloBuddy">

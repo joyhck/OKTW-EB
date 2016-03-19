@@ -9,11 +9,11 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 
-[assembly: AssemblyTitle("BerbsicAIO")]
+[assembly: AssemblyTitle("PortAIO")]
 [assembly: AssemblyDescription("Berb")]
 [assembly: AssemblyConfiguration("Berb")]
 [assembly: AssemblyCompany("Berb")]
-[assembly: AssemblyProduct("BerbsicAIO")]
+[assembly: AssemblyProduct("PortAIO")]
 [assembly: AssemblyCopyright("Copyright © Berb 2016")]
 [assembly: AssemblyTrademark("Berb")]
 [assembly: AssemblyCulture("")]

@@ -7,7 +7,7 @@ using EloBuddy.SDK.Menu;
 
 #endregion
 
-namespace BerbsicAIO
+namespace PortAIO
 {
     internal static class Init
     {
@@ -21,7 +21,7 @@ namespace BerbsicAIO
             switch (ObjectManager.Player.ChampionName.ToLower())
             {
                 case "aatrox": // BrianSharp's Aatrox
-                    BerbsicAIO.Champion.Aatrox.Program.Main();
+                    PortAIO.Champion.Aatrox.Program.Main();
                     break;
                 default:
                     return;
