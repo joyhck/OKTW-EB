@@ -72,9 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Champion\Aatrox\Program.cs" />
+    <Compile Include="Champion\Ahri\Program.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\BrianSharp\Helper.cs" />
+    <Compile Include="Utility\DZAhri\Helper.cs" />
     <Compile Include="Utility\Orbwalker\AntiGapcloser.cs" />
     <Compile Include="Utility\Orbwalker\Config.cs" />
     <Compile Include="Utility\Orbwalker\Cursor.cs" />

@@ -23,6 +23,9 @@ namespace PortAIO
                 case "aatrox": // BrianSharp's Aatrox
                     PortAIO.Champion.Aatrox.Program.Main();
                     break;
+                case "ahri": // DZAhri
+                    PortAIO.Champion.Ahri.Program.OnLoad();
+                    break;
                 default:
                     return;
             }
