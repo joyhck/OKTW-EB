@@ -493,8 +493,7 @@ namespace LeagueSharp.Common
         /// <param name="overrideRange">The override range.</param>
         /// <param name="collisionable">The collisionable.</param>
         /// <returns>PredictionOutput.</returns>
-        public PredictionOutput GetPrediction(Obj_AI_Base unit, bool aoe = false, float overrideRange = -1,
-            CollisionableObjects[] collisionable = null)
+        public PredictionOutput GetPrediction(Obj_AI_Base unit, bool aoe = false, float overrideRange = -1, CollisionableObjects[] collisionable = null)
         {
             return
                 Prediction.GetPrediction(

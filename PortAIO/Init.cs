@@ -32,6 +32,9 @@ namespace PortAIO
                 case "alistar": // El Alistar
                     PortAIO.Champion.Alistar.Program.OnGameLoad();
                     break;
+                case "amumu": // Shine#
+                    PortAIO.Champion.Amumu.Program.OnLoad();
+                    break;
                 default:
                     return;
             }
