@@ -35,6 +35,9 @@ namespace PortAIO
                 case "amumu": // Shine#
                     PortAIO.Champion.Amumu.Program.OnLoad();
                     break;
+                case "anivia": // OKTW - Sebby - All Seeby champs go down here
+                    SebbyLib.Program.GameOnOnGameLoad();
+                    break;
                 default:
                     return;
             }

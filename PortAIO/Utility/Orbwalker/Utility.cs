@@ -47,7 +47,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Returns if the source is facing the target.
         /// </summary>
-        public static bool IsFacing(this Obj_AI_Base source, Obj_AI_Base target)
+        public static bool LSIsFacing(this Obj_AI_Base source, Obj_AI_Base target)
         {
             if (source == null || target == null)
             {
@@ -287,7 +287,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Checks if this position is a wall using NavMesh
         /// </summary>
-        public static bool IsWall(this Vector2 position)
+        public static bool LSIsWall(this Vector2 position)
         {
             return position.To3D().IsWall();
         }

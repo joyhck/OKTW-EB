@@ -63,6 +63,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Extensions.Design" />
+    <Reference Include="System.Web.RegularExpressions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,11 +77,26 @@
     <Compile Include="Champion\Akali\Program.cs" />
     <Compile Include="Champion\Alistar\Program.cs" />
     <Compile Include="Champion\Amumu\Program.cs" />
+    <Compile Include="Champion\Anivia\Program.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utility\AmumuSharp\Helper.cs" />
     <Compile Include="Utility\BrianSharp\Helper.cs" />
     <Compile Include="Utility\DZAhri\Helper.cs" />
+    <Compile Include="Utility\OKTW - Core\Activator.cs" />
+    <Compile Include="Utility\OKTW - Core\AutoLvlUp.cs" />
+    <Compile Include="Utility\OKTW - Core\MissileReturn.cs" />
+    <Compile Include="Utility\OKTW - Core\OKTWdash.cs" />
+    <Compile Include="Utility\OKTW - Core\OKTWdraws.cs" />
+    <Compile Include="Utility\OKTW - Core\OKTWlab.cs" />
+    <Compile Include="Utility\OKTW - Core\OKTWtracker.cs" />
+    <Compile Include="Utility\OKTW - Core\OktwTs.cs" />
+    <Compile Include="Utility\OKTW - Core\OKTWward.cs" />
     <Compile Include="Utility\Orbwalker\AntiGapcloser.cs" />
     <Compile Include="Utility\Orbwalker\Config.cs" />
     <Compile Include="Utility\Orbwalker\Cursor.cs" />
@@ -88,6 +104,7 @@
     <Compile Include="Utility\Orbwalker\Damage.cs" />
     <Compile Include="Utility\Orbwalker\Dash.cs" />
     <Compile Include="Utility\Orbwalker\EnumerableExtensions.cs" />
+    <Compile Include="Utility\Orbwalker\GamePacket.cs" />
     <Compile Include="Utility\Orbwalker\Geometry.cs" />
     <Compile Include="Utility\Orbwalker\HealthPrediction.cs" />
     <Compile Include="Utility\Orbwalker\HeroManager.cs" />
@@ -103,6 +120,7 @@
     <Compile Include="Utility\Orbwalker\NativeMethods.cs" />
     <Compile Include="Utility\Orbwalker\OnValueChangeEventArgs.cs" />
     <Compile Include="Utility\Orbwalker\Orbwalking.cs" />
+    <Compile Include="Utility\Orbwalker\Packet.cs" />
     <Compile Include="Utility\Orbwalker\Prediction.cs" />
     <Compile Include="Utility\Orbwalker\Render.cs" />
     <Compile Include="Utility\Orbwalker\Spell.cs" />
@@ -111,11 +129,42 @@
     <Compile Include="Utility\Orbwalker\Utils.cs" />
     <Compile Include="Utility\Orbwalker\WindowsMessages.cs" />
     <Compile Include="Utility\Orbwalker\WndEventComposition.cs" />
+    <Compile Include="Utility\Sebby-OKTW\Cache.cs" />
+    <Compile Include="Utility\Sebby-OKTW\HealthPrediction.cs" />
+    <Compile Include="Utility\Sebby-OKTW\OktwCommon.cs" />
+    <Compile Include="Utility\Sebby-OKTW\Orbwalking.cs" />
+    <Compile Include="Utility\Sebby-OKTW\PredictionOktw.cs" />
+    <Compile Include="Utility\Sebby-OKTW\Program.cs" />
+    <Compile Include="Utility\SPrediction\ArcPrediction.cs" />
+    <Compile Include="Utility\SPrediction\CirclePrediction.cs" />
+    <Compile Include="Utility\SPrediction\ClipperWrapper.cs" />
+    <Compile Include="Utility\SPrediction\Collision.cs" />
+    <Compile Include="Utility\SPrediction\ConePrediction.cs" />
+    <Compile Include="Utility\SPrediction\ConfigMenu.cs" />
+    <Compile Include="Utility\SPrediction\Drawings.cs" />
+    <Compile Include="Utility\SPrediction\Geometry.cs" />
+    <Compile Include="Utility\SPrediction\LinePrediction.cs" />
+    <Compile Include="Utility\SPrediction\Obj_AI_HeroExtensions.cs" />
+    <Compile Include="Utility\SPrediction\PathTracker.cs" />
+    <Compile Include="Utility\SPrediction\Prediction.cs" />
+    <Compile Include="Utility\SPrediction\RingPrediction.cs" />
+    <Compile Include="Utility\SPrediction\SpellExtensions.cs" />
+    <Compile Include="Utility\SPrediction\StasisPrediction.cs" />
+    <Compile Include="Utility\SPrediction\Utility.cs" />
+    <Compile Include="Utility\SPrediction\VectorPrediction.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\intro.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

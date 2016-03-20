@@ -185,7 +185,7 @@ namespace LeagueSharp.Common
         /// <param name="v">The v.</param>
         /// <param name="value">The value.</param>
         /// <returns></returns>
-        public static Vector3 SetZ(this Vector3 v, float? value = null)
+        public static Vector3 LSSetZ(this Vector3 v, float? value = null)
         {
             if (value == null)
             {
@@ -243,13 +243,13 @@ namespace LeagueSharp.Common
         /// <param name="onlyIfOnSegment">if set to <c>true</c> [only if on segment].</param>
         /// <param name="squared">if set to <c>true</c> [squared].</param>
         /// <returns></returns>
-        public static float Distance(this Vector2 point,
+        public static float LSDistance(this Vector2 point,
             Vector2 segmentStart,
             Vector2 segmentEnd,
             bool onlyIfOnSegment = false,
             bool squared = false)
         {
-            var objects = point.ProjectOn(segmentStart, segmentEnd);
+            var objects = point.LSProjectOn(segmentStart, segmentEnd);
 
             if (objects.IsOnSegment || onlyIfOnSegment == false)
             {
@@ -265,7 +265,7 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="v">The vector.</param>
         /// <returns></returns>
-        public static Vector2 Normalized(this Vector2 v)
+        public static Vector2 LSNormalized(this Vector2 v)
         {
             v.Normalize();
             return v;
@@ -289,9 +289,9 @@ namespace LeagueSharp.Common
         /// <param name="to">The vector to extend to</param>
         /// <param name="distance">The distance to extend.</param>
         /// <returns></returns>
-        public static Vector2 Extend(this Vector2 v, Vector2 to, float distance)
+        public static Vector2 LSExtend(this Vector2 v, Vector2 to, float distance)
         {
-            return v + distance * (to - v).Normalized();
+            return v + distance * (to - v).LSNormalized();
         }
 
         /// <summary>
@@ -315,7 +315,7 @@ namespace LeagueSharp.Common
         /// <returns></returns>
         public static Vector2 Shorten(this Vector2 v, Vector2 to, float distance)
         {
-            return v - distance * (to - v).Normalized();
+            return v - distance * (to - v).LSNormalized();
         }
 
         /// <summary>
@@ -380,7 +380,7 @@ namespace LeagueSharp.Common
         /// <param name="self">The self.</param>
         /// <param name="other">The other.</param>
         /// <returns></returns>
-        public static float CrossProduct(this Vector2 self, Vector2 other)
+        public static float LSCrossProduct(this Vector2 self, Vector2 other)
         {
             return other.Y * self.X - other.X * self.Y;
         }
@@ -484,7 +484,7 @@ namespace LeagueSharp.Common
         /// <param name="segmentStart">The segment start.</param>
         /// <param name="segmentEnd">The segment end.</param>
         /// <returns></returns>
-        public static ProjectionInfo ProjectOn(this Vector2 point, Vector2 segmentStart, Vector2 segmentEnd)
+        public static ProjectionInfo LSProjectOn(this Vector2 point, Vector2 segmentStart, Vector2 segmentEnd)
         {
             var cx = point.X;
             var cy = point.Y;
@@ -523,7 +523,7 @@ namespace LeagueSharp.Common
         /// <param name="lineSegment2Start">The line segment2 start.</param>
         /// <param name="lineSegment2End">The line segment2 end.</param>
         /// <returns></returns>
-        public static IntersectionResult Intersection(this Vector2 lineSegment1Start,
+        public static IntersectionResult LSIntersection(this Vector2 lineSegment1Start,
             Vector2 lineSegment1End,
             Vector2 lineSegment2Start,
             Vector2 lineSegment2End)
@@ -713,7 +713,7 @@ namespace LeagueSharp.Common
 
             var A = (radius1 * radius1 - radius2 * radius2 + D * D) / (2 * D);
             var H = (float)Math.Sqrt(radius1 * radius1 - A * A);
-            var Direction = (center2 - center1).Normalized();
+            var Direction = (center2 - center1).LSNormalized();
             var PA = center1 + A * Direction;
             var S1 = PA + H * Direction.LSPerpendicular();
             var S2 = PA - H * Direction.LSPerpendicular();
@@ -744,7 +744,7 @@ namespace LeagueSharp.Common
         /// <param name="around">The around.</param>
         /// <param name="angle">The angle.</param>
         /// <returns></returns>
-        public static Vector2 RotateAroundPoint(this Vector2 rotated, Vector2 around, float angle)
+        public static Vector2 LSRotateAroundPoint(this Vector2 rotated, Vector2 around, float angle)
         {
             var sin = Math.Sin(angle);
             var cos = Math.Cos(angle);
@@ -767,7 +767,7 @@ namespace LeagueSharp.Common
         {
             var p = new Polygon();
 
-            foreach (var polygonePoint in polygon.Points.Select(poinit => poinit.RotateAroundPoint(around, angle)))
+            foreach (var polygonePoint in polygon.Points.Select(poinit => poinit.LSRotateAroundPoint(around, angle)))
             {
                 p.Add(polygonePoint);
             }
@@ -902,7 +902,7 @@ namespace LeagueSharp.Common
                 var d = (int)to.LSDistance(from);
                 if (d > distance)
                 {
-                    return from + distance * (to - from).Normalized();
+                    return from + distance * (to - from).LSNormalized();
                 }
                 distance -= d;
             }
@@ -1167,7 +1167,7 @@ namespace LeagueSharp.Common
                 public Arc(Vector2 start, Vector2 direction, float angle, float radius, int quality = 20)
                 {
                     StartPos = start;
-                    EndPos = (direction - start).Normalized();
+                    EndPos = (direction - start).LSNormalized();
                     Angle = angle;
                     Radius = radius;
                     _quality = quality;
@@ -1185,7 +1185,7 @@ namespace LeagueSharp.Common
                     var side1 = EndPos.LSRotated(-Angle * 0.5f);
                     for (var i = 0; i <= _quality; i++)
                     {
-                        var cDirection = side1.LSRotated(i * Angle / _quality).Normalized();
+                        var cDirection = side1.LSRotated(i * Angle / _quality).LSNormalized();
                         Points.Add(new Vector2(StartPos.X + outRadius * cDirection.X, StartPos.Y + outRadius * cDirection.Y));
                     }
                 }
@@ -1215,7 +1215,7 @@ namespace LeagueSharp.Common
                 public float Length
                 {
                     get { return LineStart.LSDistance(LineEnd); }
-                    set { LineEnd = (LineEnd - LineStart).Normalized() * value + LineStart; }
+                    set { LineEnd = (LineEnd - LineStart).LSNormalized() * value + LineStart; }
                 }
 
                 /// <summary>
@@ -1328,7 +1328,7 @@ namespace LeagueSharp.Common
                 /// <value>
                 /// The direction.
                 /// </value>
-                public Vector2 Direction { get { return (End - Start).Normalized(); } }
+                public Vector2 Direction { get { return (End - Start).LSNormalized(); } }
 
                 /// <summary>
                 /// Gets the perpendicular.
@@ -1524,7 +1524,7 @@ namespace LeagueSharp.Common
                 public Sector(Vector2 center, Vector2 direction, float angle, float radius, int quality = 20)
                 {
                     Center = center;
-                    Direction = (direction - center).Normalized();
+                    Direction = (direction - center).LSNormalized();
                     Angle = angle;
                     Radius = radius;
                     _quality = quality;
@@ -1543,7 +1543,7 @@ namespace LeagueSharp.Common
                     var side1 = Direction.LSRotated(-Angle * 0.5f);
                     for (var i = 0; i <= _quality; i++)
                     {
-                        var cDirection = side1.LSRotated(i * Angle / _quality).Normalized();
+                        var cDirection = side1.LSRotated(i * Angle / _quality).LSNormalized();
                         Points.Add(new Vector2(Center.X + outRadius * cDirection.X, Center.Y + outRadius * cDirection.Y));
                     }
                 }

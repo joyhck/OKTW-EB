@@ -116,7 +116,7 @@ namespace LeagueSharp.Common
         /// </summary>
         /// <param name="unit">The unit.</param>
         /// <returns></returns>
-        public static DashItem GetDashInfo(this Obj_AI_Base unit)
+        public static DashItem LSGetDashInfo(this Obj_AI_Base unit)
         {
             return DetectedDashes.ContainsKey(unit.NetworkId) ? DetectedDashes[unit.NetworkId] : new DashItem();
         }
