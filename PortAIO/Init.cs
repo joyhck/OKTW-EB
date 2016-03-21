@@ -42,7 +42,7 @@ namespace PortAIO
                 case "ashe":
                     SebbyLib.Program.GameOnOnGameLoad();
                     break;
-                case "azir":
+                case "azir": // Synx Auto Carry
                     Champion = new SAutoCarry.Champions.Azir();
                     break;
                 default:
