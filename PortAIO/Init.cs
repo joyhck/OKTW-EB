@@ -36,6 +36,7 @@ namespace PortAIO
                     PortAIO.Champion.Amumu.Program.OnLoad();
                     break;
                 case "anivia": // OKTW - Sebby - All Seeby champs go down here
+                case "annie":
                     SebbyLib.Program.GameOnOnGameLoad();
                     break;
                 default:
