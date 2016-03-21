@@ -16,6 +16,8 @@ namespace PortAIO
             Loading.OnLoadingComplete += Initialize;
         }
 
+        public static SCommon.PluginBase.Champion Champion;
+
         private static void Initialize(EventArgs args)
         {
             switch (ObjectManager.Player.ChampionName.ToLower())
@@ -39,6 +41,9 @@ namespace PortAIO
                 case "annie":
                 case "ashe":
                     SebbyLib.Program.GameOnOnGameLoad();
+                    break;
+                case "azir":
+                    Champion = new SAutoCarry.Champions.Azir();
                     break;
                 default:
                     return;
