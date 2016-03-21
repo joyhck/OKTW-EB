@@ -148,10 +148,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         Q.Cast(need.PredictedPos);
                     }
 
-                    //if (Program.Combo && PPDistance < 1400 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0 && Config.Item("autoE", true).GetValue<bool>())
-                    //{
-                        //E.Cast(Player.Position.Extend(need.PredictedPos, 5000));
-                    //}
+                    if (Program.Combo && PPDistance < 1400 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0 && PortAIO.Champion.Ashe.Program.getAutoE())
+                    {
+                        E.Cast(Player.Position.Extend(need.PredictedPos, 5000));
+                    }
 
                     if (PPDistance < 800 && Player.ChampionName == "MissFortune" && E.IsReady() && Program.Combo && Player.Mana > 200)
                     {

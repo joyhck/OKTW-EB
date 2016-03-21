@@ -124,6 +124,9 @@ namespace SebbyLib
                     case "Annie":
                         PortAIO.Champion.Annie.Program.LoadOKTW();
                         break;
+                    case "Ashe":
+                        PortAIO.Champion.Ashe.Program.LoadOKTW();
+                        break;
                 }
             }
 

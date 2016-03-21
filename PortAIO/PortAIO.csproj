@@ -79,6 +79,7 @@
     <Compile Include="Champion\Amumu\Program.cs" />
     <Compile Include="Champion\Anivia\Program.cs" />
     <Compile Include="Champion\Annie\Program.cs" />
+    <Compile Include="Champion\Ashe\Program.cs" />
     <Compile Include="Init.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
