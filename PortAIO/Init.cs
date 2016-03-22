@@ -45,6 +45,9 @@ namespace PortAIO
                 case "azir": // Synx Auto Carry
                     Champion = new SAutoCarry.Champions.Azir();
                     break;
+                case "bard": // Dreamless Wanderer
+                    PortAIO.Champion.Bard.Program.OnLoad();
+                    break;
                 default:
                     return;
             }
