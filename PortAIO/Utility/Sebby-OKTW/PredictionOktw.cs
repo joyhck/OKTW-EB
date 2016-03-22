@@ -387,16 +387,18 @@ namespace SebbyLib.Prediction
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.4f;
             float pathMinLen = 900 + + moveArea;
-            double angleMove = 30 + (input.Radius / 20) - totalDelay - (input.Delay * 2);
+            double angleMove = 31;
 
-            if (angleMove < 31)
-                angleMove = 31;
+            if (input.Radius > 70)
+                angleMove++;
+            if (input.Delay < 0.3)
+                angleMove++;
 
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
                 pathMinLen = 700f + moveArea;
-                angleMove += 3;
+                angleMove += 1.5;
                 fixRange = moveArea * 0.3f;
             }
 
@@ -416,7 +418,7 @@ namespace SebbyLib.Prediction
             }
             else if (distanceUnitToWaypoint > 300)
             {
-                angleMove += 2;
+                angleMove += 1.5;
             }
 
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
@@ -468,19 +470,19 @@ namespace SebbyLib.Prediction
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 150)
+            if (distanceFromToUnit < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES NEAR");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            else if( input.Unit.MoveSpeed < 200 )
+            else if (input.Unit.MoveSpeed < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES SLOW");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            else if(distanceFromToWaypoint < 150)
+            else if (distanceFromToWaypoint < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES ON WAY");
                 result.Hitchance = HitChance.VeryHigh;
@@ -1285,11 +1287,11 @@ namespace SebbyLib.Prediction
         public static bool SpamSamePlace(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            if (TrackerUnit.PathBank.Count < 2)
+            if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 0.3f
-                && TrackerUnit.PathBank[2].Time + 0.10f < Game.Time
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 0.2f
+                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time
                 && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 100)
             {
                 return true;
